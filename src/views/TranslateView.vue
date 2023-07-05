@@ -22,7 +22,7 @@
         </select>
         <button
           type="button"
-          class="ml-2 px-6 inline-flex rounded bg-indigo-500 shadow-indigo-500/50 py-1.5 px-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          class="translate-button"
           @click="requestTranslation"
         >
           <Spinner v-if="loading" />
@@ -42,8 +42,8 @@
           "
         />
       </div>
-      <div class="grid grid-cols-2 mt-6">
-        <div class="shadow-lg border border-gray-700 rounded m-2">
+      <div class="translate">
+        <div class="original-locale">
           <div class="p-2">Original locale</div>
           <MonacoEditor
             :value="originalContent"
@@ -57,7 +57,7 @@
             theme="vs-dark"
           />
         </div>
-        <div class="shadow-lg border border-gray-700 rounded m-2">
+        <div class="translated-locale">
           <div class="p-2">
             Translated locale
             <DocumentDuplicateIcon
@@ -251,5 +251,24 @@ export default {
   }
 };
 </script>
+<style scoped lang="scss">
+.translate{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .original-locale {
+    width: 300px;
+    height: 200px;
+    // border: 1px solid red;
+  }
+
+  .translated-locale {
+    width: 300px;
+    height: 200px;
+    // border: 1px solid red;
+  }
+}
+</style>
 
 
