@@ -45,44 +45,13 @@
       <div class="grid grid-cols-2 mt-6">
         <div class="shadow-lg border border-gray-700 rounded m-2">
           <div class="p-2">Original locale</div>
-          <MonacoEditor
-            :value="originalContent"
-            @onChange="
-              (val) => {
-                setOriginalContent(val ?? '');
-              }
-            "
-            height="600px"
-            :language="fileType"
-            theme="vs-dark"
-          />
+          <div ref="editorOrigin" style="height: 300px;"></div>
         </div>
         <div class="shadow-lg border border-gray-700 rounded m-2">
           <div class="p-2">
             Translated locale
-            <DocumentDuplicateIcon
-              @click="
-                () => {
-                  copy2Clipboard(transContent);
-                  notify(
-                    {
-                      type: 'success',
-                      title: 'copied!',
-                      message: 'copy to clipboard',
-                    },
-                    1000
-                  );
-                }
-              "
-              class="float-right w-5 text-white cursor-pointer hover:scale-110"
-            />
           </div>
-          <MonacoEditor
-            :value="transContent"
-            height="600px"
-            :language="fileType"
-            theme="vs-dark"
-          />
+          <div ref="editorTrans" style="height: 300px;"></div>
         </div>
       </div>
     </div>
@@ -90,16 +59,11 @@
 </template>
 
 <script>
-import  { ref } from "vue";
+import { ref } from "vue";
 // import  { useContext } from "vue";
 // import { toJS } from "mobx";
 // import { Link, RouterLink } from "vue-router";
-// import MonacoEditor, { loader } from "@monaco-editor/vue3";
-import MonacoEditor from "@vue/reactivity";
-import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
-import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
-import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
-import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import yaml from "js-yaml";
 // import ExportFiles from "./exportFiles";
 // import { DocumentDuplicateIcon } from "@heroicons/vue/outline";
@@ -108,24 +72,6 @@ import Spinner from "../components/SpinnerLoading";
 import TextField from "../components/TextField";
 import { translateService } from "../services/translate";
 // import { useGlobalStore } from "../../store";
-
-self.MonacoEnvironment = {
-  getWorker(_, label) {
-    if (label === "json") {
-      return new jsonWorker();
-    }
-    if (label === "css" || label === "scss" || label === "less") {
-      return new cssWorker();
-    }
-    if (label === "html" || label === "handlebars" || label === "razor") {
-      return new htmlWorker();
-    }
-    if (label === "typescript" || label === "javascript") {
-      return new tsWorker();
-    }
-    return new MonacoEditor.editor.createWebWorker();
-  },
-};
 
 // loader.config({ paths: { vs: "/assets" } });
 // loader.init();
@@ -170,6 +116,33 @@ export default {
   components: {
     Spinner,
     TextField,
+  },
+  mounted() {
+    this.initializeEditor();
+  },
+  methods: {
+    initializeEditor() {
+      const editor_origin = monaco.editor.create(this.$refs.editorOrigin, {
+        value: '',
+        language: 'json',
+        theme: 'vs-dark',
+      });
+      const editor_trans = monaco.editor.create(this.$refs.editorTrans, {
+        value: '',
+        language: 'json',
+        theme: 'vs-dark',
+      });
+
+      editor_origin.onDidChangeModelContent(() => {
+        const originValue = editor_origin.getValue();
+        console.log('Origin value:', originValue);
+      });
+      editor_trans.onDidChangeModelContent(() => {
+        const transValue = editor_trans.getValue();
+        console.log('Trans value:', transValue);
+      });
+
+    }
   },
   setup() {
     const originalContent = ref("");
@@ -248,8 +221,6 @@ export default {
       prettierJson,
       copy2Clipboard,
     };
-  }
+  },
 };
 </script>
-
-
