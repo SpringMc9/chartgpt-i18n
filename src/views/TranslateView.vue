@@ -1,8 +1,8 @@
 <template>
   <div class="about">
     <div class="container mx-auto p-4">
-      <div class="dark flex items-center">
-        <select id="select1" v-model="lang">
+      <div class="content-header">
+        <select class="select1" v-model="lang">
           <option
             v-for="option in intlLanguages"
             :value="option.value"
@@ -11,7 +11,7 @@
             {{ option.label }}
           </option>
         </select>
-        <select id="select2" v-model="fileType">
+        <select class="select2" v-model="fileType">
           <option
             v-for="option in fileTypes"
             :value="option.value"
@@ -45,17 +45,13 @@
       <div class="translate">
         <div class="original-locale">
           <div class="p-2">Original locale</div>
-          <MonacoEditor
+          <!-- <MonacoEditor
             :value="originalContent"
-            @onChange="
-              (val) => {
-                setOriginalContent(val ?? '');
-              }
-            "
+            @onChange="handleContent"
             height="600px"
             :language="fileType"
             theme="vs-dark"
-          />
+          /> -->
         </div>
         <div class="translated-locale">
           <div class="p-2">
@@ -77,12 +73,12 @@
               class="float-right w-5 text-white cursor-pointer hover:scale-110"
             />
           </div>
-          <MonacoEditor
+          <!-- <MonacoEditor
             :value="transContent"
             height="600px"
             :language="fileType"
             theme="vs-dark"
-          />
+          /> -->
         </div>
       </div>
     </div>
@@ -90,12 +86,11 @@
 </template>
 
 <script>
-import  { ref } from "vue";
+import  { reactive, ref } from "@vue/reactivity";
 // import  { useContext } from "vue";
 // import { toJS } from "mobx";
-// import { Link, RouterLink } from "vue-router";
-// import MonacoEditor, { loader } from "@monaco-editor/vue3";
-import MonacoEditor from "@vue/reactivity";
+// // import { Link, RouterLink } from "vue-router"
+// import MonacoEditor from "../components/MonacoEdit";
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
@@ -123,7 +118,7 @@ self.MonacoEnvironment = {
     if (label === "typescript" || label === "javascript") {
       return new tsWorker();
     }
-    return new MonacoEditor.editor.createWebWorker();
+    // return new MonacoEditor.editor.createWebWorker();
   },
 };
 
@@ -169,9 +164,17 @@ export default {
   name: "TranslateView",
   components: {
     Spinner,
-    TextField,
+    TextField
   },
   setup() {
+    const state = reactive({
+      monacoOptions: {
+        value: "",
+        readOnly: false, // 是否只读
+        language: "json", // 语言类型
+        theme: "vs-dark" // 编辑器主题
+      }
+    })
     const originalContent = ref("");
     const lang = ref(intlLanguages[1].value);
     const fileType = ref("");
@@ -181,6 +184,13 @@ export default {
     // const { notify } = useContext(useNotification);
     // const { commonStore } = useGlobalStore();
 
+    // 处理输入需要编译内容
+    const handleContent = (val) => {
+      console.log(state.monacoOptions.value);
+      console.log(val);
+    }
+
+    // 翻译请求
     const requestTranslation = async () => {
       loading.value = true;
       try {
@@ -247,12 +257,38 @@ export default {
       compress,
       prettierJson,
       copy2Clipboard,
+      handleContent
     };
   }
 };
 </script>
 <style scoped lang="scss">
-.translate{
+.container {
+  .content-header {
+    .select1 {
+      width: 100px;
+      height: 25px;
+      border-radius: 5%;
+      border: 2px solid rgb(20, 153, 242);
+    }
+    .select2 {
+      width: 70px;
+      height: 25px;
+      margin-left: 10px;
+      border-radius: 5%;
+      border: 2px solid rgb(20, 153, 242);
+    }
+    .translate-button {
+      width: 70px;
+      height: 25px;
+      margin-left: 10px;
+      border-radius: 5%;
+      color: #fff;
+      background-color: rgb(20, 153, 242);
+      border: 2px solid rgb(20, 153, 242);
+    }
+  }
+  .translate{
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -269,6 +305,8 @@ export default {
     // border: 1px solid red;
   }
 }
+}
+
 </style>
 
 
