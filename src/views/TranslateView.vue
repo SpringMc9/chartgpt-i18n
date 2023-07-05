@@ -260,13 +260,13 @@ export default {
   .original-locale {
     width: 300px;
     height: 200px;
-    border: 1px solid red;
+    // border: 1px solid red;
   }
 
   .translated-locale {
     width: 300px;
     height: 200px;
-    border: 1px solid red;
+    // border: 1px solid red;
   }
 }
 </style>
