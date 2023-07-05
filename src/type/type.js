@@ -1,1 +1,1 @@
-export const FileType = "json" | "yaml";
+// export const FileType = "json" | "yaml";
