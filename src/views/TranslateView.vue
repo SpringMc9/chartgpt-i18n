@@ -145,7 +145,7 @@ export default {
           targetLang: lang,
           extraPrompt: extraPrompt,
           config:{
-            apiKey: "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",
+            apiKey: "",
             serviceProvider:"openai"
           },
         });
