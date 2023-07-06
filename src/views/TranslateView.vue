@@ -1,8 +1,8 @@
 <template>
   <div class="about">
     <div class="container mx-auto p-4">
-      <div class="dark flex items-center">
-        <select id="select1" v-model="lang">
+      <div class="content-header">
+        <select class="select1" v-model="lang">
           <option
             v-for="option in intlLanguages"
             :value="option.value"
@@ -13,7 +13,7 @@
         </select>
         <button
           type="button"
-          class="ml-2 px-6 inline-flex rounded bg-indigo-500 shadow-indigo-500/50 py-1.5 px-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          class="translate-button"
           @click="requestTranslation"
         >
           Translate
@@ -32,12 +32,12 @@
           "
         />
       </div>
-      <div class="grid grid-cols-2 mt-6">
-        <div class="shadow-lg border border-gray-700 rounded m-2">
+      <div class="translate">
+        <div class="original-locale">
           <div class="p-2">Original locale</div>
           <div ref="editorOrigin" style="height: 300px;"></div>
         </div>
-        <div class="shadow-lg border border-gray-700 rounded m-2">
+        <div class="translated-locale">
           <div class="p-2">
             Translated locale
           </div>
@@ -124,6 +124,7 @@ export default {
     const transContent = ref("");
     const extraPrompt = ref("");
 
+    // 翻译请求
     const requestTranslation = async () => {
       try {
         const compressedContent = compress(
@@ -171,8 +172,55 @@ export default {
       requestTranslation,
       compress,
       prettierJson,
-      copy2Clipboard,
+      copy2Clipboard    
     };
   },
 };
 </script>
+
+<style scoped lang="scss">
+.container {
+  .content-header {
+    .select1 {
+      width: 100px;
+      height: 25px;
+      border-radius: 5%;
+      border: 2px solid rgb(20, 153, 242);
+    }
+    .select2 {
+      width: 70px;
+      height: 25px;
+      margin-left: 10px;
+      border-radius: 5%;
+      border: 2px solid rgb(20, 153, 242);
+    }
+    .translate-button {
+      width: 70px;
+      height: 25px;
+      margin-left: 10px;
+      border-radius: 5%;
+      color: #fff;
+      background-color: rgb(20, 153, 242);
+      border: 2px solid rgb(20, 153, 242);
+    }
+  }
+  .translate{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .original-locale {
+    width: 300px;
+    height: 200px;
+    // border: 1px solid red;
+  }
+
+  .translated-locale {
+    width: 300px;
+    height: 200px;
+    // border: 1px solid red;
+  }
+}
+}
+
+</style>
