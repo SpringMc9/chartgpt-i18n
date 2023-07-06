@@ -54,7 +54,7 @@
 
 <script>
 import { ref } from "vue";
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import TextField from "../components/TextField";
 import { translateService } from "../services/translate";
 
@@ -113,49 +113,24 @@ export default {
 
       editor_origin.onDidChangeModelContent(() => {
         const originValue = editor_origin.getValue();
-        console.log('Origin value:', originValue);
+        this.originalContent = originValue;
       });
       editor_trans.onDidChangeModelContent(() => {
         const transValue = editor_trans.getValue();
-        console.log('Trans value:', transValue);
+        this.transContent = transValue;
       });
-
-    }
+    },
+    updateExtraPrompt(value) {
+      this.extraPrompt = value;
+    },
   },
   setup() {
-    const originalContent = ref("");
-    const lang = ref(intlLanguages[1].value);
-    const transContent = ref("");
-    const extraPrompt = ref("");
+    let originalContent = ref("");
+    let lang = ref(intlLanguages[1].value);
+    let transContent = ref("");
+    let extraPrompt = ref("");
 
-    // 翻译请求
-    const requestTranslation = async () => {
-      try {
-        const compressedContent = compress(
-          originalContent.value,
-        );
-        const data = await translateService({
-          content: compressedContent,
-          targetLang: lang.value,
-          extraPrompt: extraPrompt.value,
-          // config: toJS(commonStore.config),
-        });
-        transContent.value = prettierJson(data);
-      } catch (error) {
-        console.log("translate service error!!");
-      }
-    };
-
-    const compress = (content, fileType) => {
-      try {
-        return JSON.stringify(JSON.parse(content))
-      } catch (error) {
-        throw new Error(`${fileType} is not valid`);
-      }
-    };
-
-    const prettierJson = (content) => {
-      if (typeof content !== "string") return JSON.stringify(content, null, 2);
+    const compress = (content) => {
       try {
         return JSON.stringify(JSON.parse(content));
       } catch (error) {
@@ -163,8 +138,31 @@ export default {
       }
     };
 
-    const copy2Clipboard = (content) => {
-      navigator.clipboard.writeText(content);
+    const prettierJson = (content) => {
+      if (typeof content !== "string") return JSON.stringify(content, null, 2);
+      try {
+        return JSON.stringify(JSON.parse(content), null, 2);
+      } catch (error) {
+        throw new Error("json is not valid");
+      }
+    };
+    // 翻译请求
+    const requestTranslation = async () => {
+      try {
+        const compressedContent = compress(originalContent);
+        const data = await translateService({
+          content: compressedContent,
+          targetLang: lang,
+          extraPrompt: extraPrompt,
+          config:{
+            apiKey: "",
+            serviceProvider:"openai"
+          },
+        });
+        transContent = prettierJson(data);
+      } catch (error) {
+        console.log("translate service error!!");
+      }
     };
 
     return {
@@ -176,7 +174,6 @@ export default {
       requestTranslation,
       compress,
       prettierJson,
-      copy2Clipboard
     };
   },
 };
