@@ -137,9 +137,7 @@ export default {
         });
         transContent.value = prettierJson(data);
       } catch (error) {
-        //
-      } finally {
-        //
+        console.log("translate service error!!");
       }
     };
 
