@@ -6,7 +6,7 @@ import {
 } from "../utils";
 import { buildJsonByPairs } from "../../api/utils/utils";
 
-export default async function translateService(req) {
+export async function translateService(req) {
   const { config, content, targetLang, extraPrompt } = req;
   const messages = [
     {
@@ -115,6 +115,6 @@ export default async function translateService(req) {
     .map((t, i) => [requireTranslation[i][0], t])
     .concat(noTranslation);
   const result = buildJsonByPairs(nextPairs);
-  console.log(result);
+  // console.log(result);
   return result;
 }

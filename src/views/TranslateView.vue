@@ -1,54 +1,51 @@
 <template>
-    <div class="container">
-      <div class="content-header">
-        <select class="select" v-model="lang">
-          <option 
-            v-for="option in intlLanguages" 
-            :value="option.value" 
-            :key="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-        <button 
-          type="button" 
-          class="translate-button" 
-          @click="requestTranslation"
+  <div class="container">
+    <div class="content-header">
+      <select class="select" v-model="lang">
+        <option
+          v-for="option in intlLanguages"
+          :value="option.value"
+          :key="option.value"
         >
-          Translate
-        </button>
-        <!-- <ExportFiles :originalContent="originalContent" :fileType="fileType" /> -->
+          {{ option.label }}
+        </option>
+      </select>
+      <button
+        type="button"
+        class="translate-button"
+        @click="requestTranslation"
+      >
+        Translate
+      </button>
+      <!-- <ExportFiles :originalContent="originalContent" :fileType="fileType" /> -->
+    </div>
+    <div class="text-field">
+      <TextField
+        label="Customized Prompt (Optional)"
+        placeholder="Add more prompt (like background knowledge) to help the translation if needed."
+        :value="extraPrompt"
+        :onChange="updateExtraPrompt"
+      />
+    </div>
+    <div class="translate-content">
+      <div class="original-locale">
+        <div class="text">Original locale</div>
+        <div
+          class="original"
+          ref="editorOrigin"
+          style="width: 600px; height: 650px"
+        ></div>
       </div>
-      <div class="text-field">
-        <TextField 
-          label="Customized Prompt (Optional)"
-          placeholder="Add more prompt (like background knowledge) to help the translation if needed."
-          :value="extraPrompt"
-          :onChange="updateExtraPrompt"
-        />
-      </div>
-      <div class="translate-content">
-        <div class="original-locale">
-          <div class="text">Original locale</div>
-          <div
-            class="original" 
-            ref="editorOrigin" 
-            style="width:600px;height: 650px;"
-          >
-          </div>
-        </div>
-        <div class="translated-locale">
-          <div class="text">
-            Translated locale
-          </div>
-          <div 
-            class="translated"
-            ref="editorTrans" 
-            style="width:600px; height: 650px;"
-          >
-          </div>
-        </div>
+      <div class="translated-locale">
+        <div class="text">Translated locale</div>
+        <div
+          class="translated"
+          ref="editorTrans"
+          style="width: 600px; height: 650px"
+        ></div>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -100,23 +97,19 @@ export default {
   methods: {
     initializeEditor() {
       const editor_origin = monaco.editor.create(this.$refs.editorOrigin, {
-        value: '',
-        language: 'json',
-        theme: 'vs',
+        value: "",
+        language: "json",
+        theme: "vs",
       });
-      const editor_trans = monaco.editor.create(this.$refs.editorTrans, {
-        value: '',
-        language: 'json',
-        theme: 'vs',
+      monaco.editor.create(this.$refs.editorTrans, {
+        value: this.transContent,
+        language: "json",
+        theme: "vs",
       });
 
       editor_origin.onDidChangeModelContent(() => {
         const originValue = editor_origin.getValue();
         this.originalContent = originValue;
-      });
-      editor_trans.onDidChangeModelContent(() => {
-        const transValue = editor_trans.getValue();
-        this.transContent = transValue;
       });
     },
     updateExtraPrompt(value) {
@@ -131,7 +124,7 @@ export default {
 
     const compress = (content) => {
       try {
-        return JSON.stringify(JSON.parse(content));
+        return JSON.stringify(JSON.parse(content.value));
       } catch (error) {
         throw new Error("json is not valid");
       }
@@ -151,15 +144,16 @@ export default {
         const compressedContent = compress(originalContent);
         const data = await translateService({
           content: compressedContent,
-          targetLang: lang,
-          extraPrompt: extraPrompt,
-          config:{
-            apiKey: "",
-            serviceProvider:"openai"
+          targetLang: lang.value,
+          extraPrompt: extraPrompt.value,
+          config: {
+            apiKey: "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",
+            serviceProvider: "openai",
           },
         });
         transContent = prettierJson(data);
       } catch (error) {
+        console.log(error);
         console.log("translate service error!!");
       }
     };
@@ -218,17 +212,17 @@ export default {
     margin-bottom: 20px;
 
     .text {
-        font-size: 20px;
-        font-weight: 600;
-        margin: 5px 0;
-      }
+      font-size: 20px;
+      font-weight: 600;
+      margin: 5px 0;
+    }
     .original-locale {
       width: 601px;
       height: 685px;
       border-radius: 7px;
       border: 2px solid black;
 
-      .original{
+      .original {
         display: inline-block;
         text-align: left;
       }
