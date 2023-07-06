@@ -25,23 +25,17 @@
           label="Customized Prompt (Optional)"
           placeholder="Add more prompt (like background knowledge) to help the translation if needed."
           :value="extraPrompt"
-          @onChange="
-            (val) => {
-              setExtraPrompt(val);
-            }
-          "
+          :onChange="updateExtraPrompt"
         />
       </div>
       <div class="translate">
         <div class="original-locale">
           <div class="p-2">Original locale</div>
-          <div ref="editorOrigin" style="height: 300px;"></div>
+          <div ref="editorOrigin" style="height: 300px"></div>
         </div>
         <div class="translated-locale">
-          <div class="p-2">
-            Translated locale
-          </div>
-          <div ref="editorTrans" style="height: 300px;"></div>
+          <div class="p-2">Translated locale</div>
+          <div ref="editorTrans" style="height: 300px"></div>
         </div>
       </div>
     </div>
@@ -50,7 +44,7 @@
 
 <script>
 import { ref } from "vue";
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import TextField from "../components/TextField";
 import { translateService } from "../services/translate";
 
@@ -97,61 +91,36 @@ export default {
   methods: {
     initializeEditor() {
       const editor_origin = monaco.editor.create(this.$refs.editorOrigin, {
-        value: '',
-        language: 'json',
-        theme: 'vs-dark',
+        value: "",
+        language: "json",
+        theme: "vs-dark",
       });
       const editor_trans = monaco.editor.create(this.$refs.editorTrans, {
-        value: '',
-        language: 'json',
-        theme: 'vs-dark',
+        value: "",
+        language: "json",
+        theme: "vs-dark",
       });
 
       editor_origin.onDidChangeModelContent(() => {
         const originValue = editor_origin.getValue();
-        console.log('Origin value:', originValue);
+        this.originalContent = originValue;
       });
       editor_trans.onDidChangeModelContent(() => {
         const transValue = editor_trans.getValue();
-        console.log('Trans value:', transValue);
+        this.transContent = transValue;
       });
-
-    }
+    },
+    updateExtraPrompt(value) {
+      this.extraPrompt = value;
+    },
   },
   setup() {
-    const originalContent = ref("");
-    const lang = ref(intlLanguages[1].value);
-    const transContent = ref("");
-    const extraPrompt = ref("");
+    let originalContent = ref("");
+    let lang = ref(intlLanguages[1].value);
+    let transContent = ref("");
+    let extraPrompt = ref("");
 
-    // 翻译请求
-    const requestTranslation = async () => {
-      try {
-        const compressedContent = compress(
-          originalContent.value,
-        );
-        const data = await translateService({
-          content: compressedContent,
-          targetLang: lang.value,
-          extraPrompt: extraPrompt.value,
-          // config: toJS(commonStore.config),
-        });
-        transContent.value = prettierJson(data);
-      } catch (error) {
-        console.log("translate service error!!");
-      }
-    };
-
-    const compress = (content, fileType) => {
-      try {
-        return JSON.stringify(JSON.parse(content))
-      } catch (error) {
-        throw new Error(`${fileType} is not valid`);
-      }
-    };
-
-    const prettierJson = (content) => {
-      if (typeof content !== "string") return JSON.stringify(content, null, 2);
+    const compress = (content) => {
       try {
         return JSON.stringify(JSON.parse(content));
       } catch (error) {
@@ -159,8 +128,31 @@ export default {
       }
     };
 
-    const copy2Clipboard = (content) => {
-      navigator.clipboard.writeText(content);
+    const prettierJson = (content) => {
+      if (typeof content !== "string") return JSON.stringify(content, null, 2);
+      try {
+        return JSON.stringify(JSON.parse(content), null, 2);
+      } catch (error) {
+        throw new Error("json is not valid");
+      }
+    };
+    // 翻译请求
+    const requestTranslation = async () => {
+      try {
+        const compressedContent = compress(originalContent);
+        const data = await translateService({
+          content: compressedContent,
+          targetLang: lang,
+          extraPrompt: extraPrompt,
+          config:{
+            apiKey: "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",
+            serviceProvider:"openai"
+          },
+        });
+        transContent = prettierJson(data);
+      } catch (error) {
+        console.log("translate service error!!");
+      }
     };
 
     return {
@@ -172,7 +164,6 @@ export default {
       requestTranslation,
       compress,
       prettierJson,
-      copy2Clipboard    
     };
   },
 };
@@ -204,23 +195,22 @@ export default {
       border: 2px solid rgb(20, 153, 242);
     }
   }
-  .translate{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  .translate {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 
-  .original-locale {
-    width: 300px;
-    height: 200px;
-    // border: 1px solid red;
-  }
+    .original-locale {
+      width: 300px;
+      height: 200px;
+      // border: 1px solid red;
+    }
 
-  .translated-locale {
-    width: 300px;
-    height: 200px;
-    // border: 1px solid red;
+    .translated-locale {
+      width: 300px;
+      height: 200px;
+      // border: 1px solid red;
+    }
   }
 }
-}
-
 </style>
