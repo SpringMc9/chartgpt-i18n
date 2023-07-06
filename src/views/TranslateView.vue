@@ -1,45 +1,54 @@
 <template>
-  <div class="about">
-    <div class="container mx-auto p-4">
+    <div class="container">
       <div class="content-header">
-        <select class="select1" v-model="lang">
-          <option
-            v-for="option in intlLanguages"
-            :value="option.value"
-            :key="option.value"
-          >
+        <select class="select" v-model="lang">
+          <option 
+            v-for="option in intlLanguages" 
+            :value="option.value" 
+            :key="option.value">
             {{ option.label }}
           </option>
         </select>
-        <button
-          type="button"
-          class="translate-button"
+        <button 
+          type="button" 
+          class="translate-button" 
           @click="requestTranslation"
         >
           Translate
         </button>
         <!-- <ExportFiles :originalContent="originalContent" :fileType="fileType" /> -->
       </div>
-      <div class="mt-2">
-        <TextField
+      <div class="text-field">
+        <TextField 
           label="Customized Prompt (Optional)"
           placeholder="Add more prompt (like background knowledge) to help the translation if needed."
           :value="extraPrompt"
           :onChange="updateExtraPrompt"
         />
       </div>
-      <div class="translate">
+      <div class="translate-content">
         <div class="original-locale">
-          <div class="p-2">Original locale</div>
-          <div ref="editorOrigin" style="height: 300px"></div>
+          <div class="text">Original locale</div>
+          <div
+            class="original" 
+            ref="editorOrigin" 
+            style="width:600px;height: 650px;"
+          >
+          </div>
         </div>
         <div class="translated-locale">
-          <div class="p-2">Translated locale</div>
-          <div ref="editorTrans" style="height: 300px"></div>
+          <div class="text">
+            Translated locale
+          </div>
+          <div 
+            class="translated"
+            ref="editorTrans" 
+            style="width:600px; height: 650px;"
+          >
+          </div>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -91,14 +100,14 @@ export default {
   methods: {
     initializeEditor() {
       const editor_origin = monaco.editor.create(this.$refs.editorOrigin, {
-        value: "",
-        language: "json",
-        theme: "vs-dark",
+        value: '',
+        language: 'json',
+        theme: 'vs',
       });
       const editor_trans = monaco.editor.create(this.$refs.editorTrans, {
-        value: "",
-        language: "json",
-        theme: "vs-dark",
+        value: '',
+        language: 'json',
+        theme: 'vs',
       });
 
       editor_origin.onDidChangeModelContent(() => {
@@ -171,45 +180,71 @@ export default {
 
 <style scoped lang="scss">
 .container {
+  display: inline-block;
   .content-header {
-    .select1 {
+    display: inline-block;
+    .select {
       width: 100px;
-      height: 25px;
-      border-radius: 5%;
-      border: 2px solid rgb(20, 153, 242);
+      height: 33px;
+      font-size: 16px;
+      border-radius: 7px;
+      border: none;
+      outline: none;
     }
-    .select2 {
-      width: 70px;
-      height: 25px;
-      margin-left: 10px;
-      border-radius: 5%;
-      border: 2px solid rgb(20, 153, 242);
-    }
+
     .translate-button {
-      width: 70px;
-      height: 25px;
-      margin-left: 10px;
-      border-radius: 5%;
+      width: 90px;
+      height: 33px;
+      margin-left: 20px;
+      border-radius: 7px;
+      font-size: 16px;
+      font-weight: 600;
       color: #fff;
       background-color: rgb(20, 153, 242);
       border: 2px solid rgb(20, 153, 242);
     }
   }
-  .translate {
+  .text-field {
+    margin-top: 10px;
+    text-align: left;
+  }
+
+  .translate-content {
+    height: auto;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
 
+    .text {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 5px 0;
+      }
     .original-locale {
-      width: 300px;
-      height: 200px;
-      // border: 1px solid red;
+      width: 601px;
+      height: 685px;
+      border-radius: 7px;
+      border: 2px solid black;
+
+      .original{
+        display: inline-block;
+        text-align: left;
+      }
     }
 
     .translated-locale {
-      width: 300px;
-      height: 200px;
-      // border: 1px solid red;
+      width: 601px;
+      margin-left: 10px;
+      height: 685px;
+      border-radius: 7px;
+      border: 2px solid black;
+
+      .translated {
+        display: inline-block;
+        text-align: left;
+      }
     }
   }
 }

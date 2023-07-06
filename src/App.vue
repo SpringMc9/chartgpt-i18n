@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link> |
+    <router-link to="/">Setting</router-link> |
     <router-link to="/translate">Translate</router-link>
   </nav>
   <router-view/>
@@ -13,6 +13,8 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: #42b983;
+  min-height: 98vh;
 }
 
 nav {
@@ -23,7 +25,7 @@ nav {
     color: #2c3e50;
 
     &.router-link-exact-active {
-      color: #42b983;
+      color: #fff;
     }
   }
 }
