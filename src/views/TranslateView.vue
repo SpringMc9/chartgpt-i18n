@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref}  from "vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import TextField from "../components/TextField";
 import { translateService } from "../services/translate";
@@ -113,23 +113,21 @@ export default {
 
       editor_origin.onDidChangeModelContent(() => {
         const originValue = editor_origin.getValue();
-        this.originalContent = originValue;
+        console.log('Origin value:', originValue);
       });
       editor_trans.onDidChangeModelContent(() => {
         const transValue = editor_trans.getValue();
-        this.transContent = transValue;
+        console.log('Trans value:', transValue);
       });
-    },
-    updateExtraPrompt(value) {
-      this.extraPrompt = value;
-    },
+
+    }
   },
   setup() {
     let originalContent = ref("");
     let lang = ref(intlLanguages[1].value);
     let transContent = ref("");
     let extraPrompt = ref("");
-
+  
     const compress = (content) => {
       try {
         return JSON.stringify(JSON.parse(content));
@@ -161,6 +159,8 @@ export default {
         });
         transContent = prettierJson(data);
       } catch (error) {
+        editor_origin.value = '111'
+        console.log(editor_origin.value);
         console.log("translate service error!!");
       }
     };
@@ -174,6 +174,8 @@ export default {
       requestTranslation,
       compress,
       prettierJson,
+      updateExtraPrompt,
+      initializeEditor
     };
   },
 };
