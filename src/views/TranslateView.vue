@@ -20,8 +20,8 @@
       </div>
       <div class="text-field">
         <TextField 
-          label="Customized Prompt (Optional)"
-          placeholder="Add more prompt (like background knowledge) to help the translation if needed."
+          label="添加更多提示（如背景知识）以帮助翻译"
+          placeholder="非必填"
           :value="extraPrompt" @onChange="(val) => {
               setExtraPrompt(val);
           }" 

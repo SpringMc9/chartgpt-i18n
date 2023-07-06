@@ -32,7 +32,7 @@ export default {
   methods: {  
     handleInput(event) {  
       this.onChange(event.target.value);  
-    }  
+    } 
   }  
 };  
 </script>  

@@ -1,6 +1,8 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <p>You config will only be used by yourself and stored in your localStorage.</p>
+    <input type="text" placeholder="openai">
+    <input :value="value" @input="handleInput">
   </div>
 </template>
 
