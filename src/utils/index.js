@@ -33,22 +33,25 @@ export const groupPairs = (pairs) => {
   };
 };
 
-export const createChatCompletion = async (props, config) => {
-  let url = "";
+export const createChatCompletion = async (props) => {
+  let url =
+    "https://ai-proxy.ksord.com/wps3.openai.azure.com/openai/deployments/gpt-35-turbo-version-0301/chat/completions?api-version=2023-03-15-preview";
   const headers = {
-    "Content-Type": "application/json",
+    "Content-Type": "application/json; charset=utf-8",
+    "Api-Key": "G4Q1R0jNruMDIzV0z32yEHaJxwDkNnnP",
   };
-  if (config.serviceProvider === "openai") {
-    url = "https://api.openai.com/v1/chat/completions";
-    headers["Authorization"] = `Bearer ${config.apiKey}`;
-  }
   const response = await fetch(url, {
     method: "POST",
     headers,
     body: JSON.stringify({
-      model: props.model,
+      model: "gpt-35-turbo-version-0301",
+      frequency_penalty: 0,
+      max_tokens: 1000,
+      presence_penalty: 0,
+      stream: true,
+      temperature: 0.7,
+      top_p: 1,
       messages: props.messages,
-      temperature: 0,
     }),
   });
   if (response.status !== 200) {
@@ -56,6 +59,30 @@ export const createChatCompletion = async (props, config) => {
   }
   return await response.json();
 };
+// export const createChatCompletion = async (props, config) => {
+//   let url = "";
+//   const headers = {
+//     "Content-Type": "application/json",
+//   };
+//   if (config.serviceProvider === "openai") {
+//     url = "https://api.openai.com/v1/chat/completions";
+//     headers["Authorization"] = `Bearer ${config.apiKey}`;
+//   }
+//   console.log(props.messages);
+//   const response = await fetch(url, {
+//     method: "POST",
+//     headers,
+//     body: JSON.stringify({
+//       model: props.model,
+//       messages: props.messages,
+//       temperature: 0,
+//     }),
+//   });
+//   if (response.status !== 200) {
+//     throw new Error("failed to create chat completion");
+//   }
+//   return await response.json();
+// };
 
 export const matchJSON = (str) => {
   let start = 0;

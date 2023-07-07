@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUpdated } from "vue";
+import { ref, onMounted } from "vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import TextField from "../components/TextField";
 import ExportFiles from "../components/ExportFiles";
@@ -130,11 +130,11 @@ export default {
       initializeEditor();
     });
 
-    onUpdated(() => {
-      if (transContent.value !== editor_trans.getValue()) {
-        editor_trans.setValue(transContent.value);
-      }
-    });
+    // onUpdated(() => {
+    //   if (transContent.value !== editor_trans.getValue()) {
+    //     editor_trans.setValue(transContent.value);
+    //   }
+    // });
 
     const copy2Clipboard = (content) => {
       navigator.clipboard.writeText(content);
