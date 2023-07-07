@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted, onUpdated } from "vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import TextField from "../components/TextField";
 import { translateService } from "../services/translate";
@@ -91,36 +91,68 @@ export default {
   components: {
     TextField,
   },
-  mounted() {
-    this.initializeEditor();
-  },
-  methods: {
-    initializeEditor() {
-      const editor_origin = monaco.editor.create(this.$refs.editorOrigin, {
+  setup() {
+    const originalContent = ref("");
+    let lang = ref(intlLanguages[1].value);
+    const transContent = ref("");
+    let extraPrompt = ref("");
+    const editorOrigin = ref(null);
+    const editorTrans = ref(null);
+    let editor_origin = null;
+    let editor_trans = null;
+    // 获取localStorage中的openai
+    const configObject = localStorage.getItem("config");
+    const config = JSON.parse(configObject);
+
+    // 初始化编辑器
+    const initializeEditor = () => {
+      editor_origin = monaco.editor.create(editorOrigin.value, {
         value: "",
         language: "json",
         theme: "vs",
       });
-      monaco.editor.create(this.$refs.editorTrans, {
-        value: this.transContent,
+      editor_trans = monaco.editor.create(editorTrans.value, {
+        value: "",
         language: "json",
         theme: "vs",
       });
 
       editor_origin.onDidChangeModelContent(() => {
         const originValue = editor_origin.getValue();
-        this.originalContent = originValue;
+        originalContent.value = originValue;
       });
-    },
-    updateExtraPrompt(value) {
-      this.extraPrompt = value;
-    },
-  },
-  setup() {
-    let originalContent = ref("");
-    let lang = ref(intlLanguages[1].value);
-    let transContent = ref("");
-    let extraPrompt = ref("");
+    };
+
+    // 翻译请求
+    const requestTranslation = async () => {
+      try {
+        const compressedContent = compress(originalContent);
+        const data = await translateService({
+          content: compressedContent,
+          targetLang: lang.value,
+          extraPrompt: extraPrompt.value,
+          config: {
+            apiKey: config.apiKey,
+            serviceProvider: "openai",
+          },
+        });
+        transContent.value = prettierJson(data);
+        editor_trans.setValue(transContent.value);
+      } catch (error) {
+        console.log(error);
+        console.log("translate service error!!");
+      }
+    };
+
+    onMounted(() => {
+      initializeEditor();
+    });
+
+    onUpdated(() => {
+      if (transContent.value !== editor_trans.getValue()) {
+        editor_trans.setValue(transContent.value);
+      }
+    });
 
     const compress = (content) => {
       try {
@@ -138,35 +170,18 @@ export default {
         throw new Error("json is not valid");
       }
     };
-    // 翻译请求
-    const requestTranslation = async () => {
-      try {
-        const compressedContent = compress(originalContent);
-        const data = await translateService({
-          content: compressedContent,
-          targetLang: lang.value,
-          extraPrompt: extraPrompt.value,
-          config: {
-            apiKey: "",
-            serviceProvider: "openai",
-          },
-        });
-        transContent = prettierJson(data);
-      } catch (error) {
-        console.log(error);
-        console.log("translate service error!!");
-      }
-    };
 
     return {
       originalContent,
       lang,
       transContent,
       extraPrompt,
+      editorOrigin,
+      editorTrans,
       intlLanguages,
-      requestTranslation,
-      compress,
-      prettierJson
+      editor_origin,
+      editor_trans,
+      requestTranslation
     };
   },
 };

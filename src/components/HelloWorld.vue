@@ -29,7 +29,6 @@ export default {
   name: "HelloWorld",
   setup() {
     const configSelect = [
-      // { value: "azure", label: "azure" },
       { value: "openai", label: "openai" },
     ];
 
@@ -51,6 +50,7 @@ export default {
       config.apiKey = value.value
       config.serviceProvider = lang.value
       localStorage.setItem("config", JSON.stringify(config));
+      window.alert("openai KPI已保存至localStorage");
     };
 
     return {
