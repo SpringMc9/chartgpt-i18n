@@ -10,7 +10,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
     "@headlessui/vue": "^1.7.14",
-    "@heroicons/vue": "^2.0.18",
+    "@heroicons/vue": "^1.0.6",
     "@vue/reactivity": "^3.3.4",
     "@zip.js/zip.js": "^2.7.17",
     "core-js": "^3.8.3",

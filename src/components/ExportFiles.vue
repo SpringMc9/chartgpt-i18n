@@ -98,10 +98,9 @@ export default {
         const compressedContent = compress(originalContent.value);
         const res = await exportLocalFiles(
           compressedContent,
-          selectedLangs.value,
-          "json"
+          selectedLangs.value
         );
-        const file = await makeLocalesInZip(res, "json");
+        const file = await makeLocalesInZip(res,"json");
         downloadFileFromBlob(file, "locales.zip");
       } catch (error) {
         console.log(error);

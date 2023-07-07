@@ -37,7 +37,13 @@
         ></div>
       </div>
       <div class="translated-locale">
-        <div class="text">Translated locale</div>
+        <div class="text">
+          Translated locale
+          <DocumentDuplicateIcon
+            @click="copy2Clipboard(transContent)"
+            class="copy"
+          />
+        </div>
         <div
           class="translated"
           ref="editorTrans"
@@ -55,12 +61,14 @@ import TextField from "../components/TextField";
 import ExportFiles from "../components/ExportFiles";
 import { translateService } from "../services/translate";
 import { intlLanguages } from "../type/type";
+import { DocumentDuplicateIcon } from "@heroicons/vue/outline";
 
 export default {
   name: "TranslateView",
   components: {
     TextField,
     ExportFiles,
+    DocumentDuplicateIcon,
   },
   setup() {
     const originalContent = ref("");
@@ -128,6 +136,10 @@ export default {
       }
     });
 
+    const copy2Clipboard = (content) => {
+      navigator.clipboard.writeText(content);
+    };
+
     const compress = (content) => {
       try {
         return JSON.stringify(JSON.parse(content.value));
@@ -156,6 +168,7 @@ export default {
       editor_trans,
       requestTranslation,
       updateExtraPrompt,
+      copy2Clipboard,
     };
   },
 };
@@ -224,6 +237,11 @@ export default {
       border-radius: 7px;
       border: 2px solid black;
 
+      .copy {
+        width: 1.35rem;
+        float: right;
+        margin-right: 3px;
+      }
       .translated {
         display: inline-block;
         text-align: left;
