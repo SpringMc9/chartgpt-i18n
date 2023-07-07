@@ -13,7 +13,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  background-color: #42b983;
+  background-color: #EAF6FF;
   min-height: 98vh;
 }
 
@@ -25,7 +25,7 @@ nav {
     color: #2c3e50;
 
     &.router-link-exact-active {
-      color: #fff;
+      color: #CCCCCC;
     }
   }
 }

@@ -51,6 +51,7 @@ export default {
     border-radius: 7px;
     border: none;
     outline: none;
+    margin-top: 6px;
   }
 }
 </style>

@@ -93,6 +93,9 @@ export default {
         originalContent.value = originValue;
       });
     };
+    const updateExtraPrompt = (value) => {
+      extraPrompt = value;
+    };
 
     // 翻译请求
     const requestTranslation = async () => {
@@ -151,7 +154,8 @@ export default {
       intlLanguages,
       editor_origin,
       editor_trans,
-      requestTranslation
+      requestTranslation,
+      updateExtraPrompt,
     };
   },
 };

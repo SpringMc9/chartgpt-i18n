@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <p>
-      You config will only be used by yourself and stored in your localStorage.
+      Your config will only be used by yourself and stored in your localStorage.
     </p>
     <div class="select-box">
       <select class="select" v-model="lang">
@@ -26,7 +26,8 @@
 import { ref } from "vue";
 
 export default {
-  name: "HelloWorld",
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: "Setting",
   setup() {
     const configSelect = [
       { value: "openai", label: "openai" },
@@ -34,11 +35,11 @@ export default {
 
     const config = {
         apiKey: "your-key",
-        serviceProvider: "azure",
+        serviceProvider: "openai",
         model: "gpt-3.5-turbo-0301",
     };
 
-    const lang = ref("azure");
+    const lang = ref("openai");
     const value = ref("");
 
     const handleInput = (event) => {
@@ -81,13 +82,15 @@ export default {
       border-radius: 7px;
       border: none;
       outline: none;
+      margin-top: 7px;
+      margin-bottom: 7px;
     }
   }
   .input-openai {
     width: 1212px;
     height: 30px;
     border-radius: 7px;
-    margin-top: -8px;
+    margin-top: 7px;
     margin-bottom: 10px;
     border: none;
     outline: none;
