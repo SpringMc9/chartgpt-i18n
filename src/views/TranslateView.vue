@@ -166,7 +166,7 @@ export default {
       intlLanguages,
       requestTranslation,
       compress,
-      prettierJson,
+      prettierJson
     };
   },
 };
