@@ -12,6 +12,7 @@
     "@headlessui/vue": "^1.7.14",
     "@heroicons/vue": "^2.0.18",
     "@vue/reactivity": "^3.3.4",
+    "@zip.js/zip.js": "^2.7.17",
     "core-js": "^3.8.3",
     "element-plus": "^2.3.7",
     "element-ui": "^2.15.13",
