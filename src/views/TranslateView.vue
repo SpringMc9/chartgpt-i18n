@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { ref}  from "vue";
+import { ref } from "vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import TextField from "../components/TextField";
 import { translateService } from "../services/translate";
@@ -101,33 +101,31 @@ export default {
   methods: {
     initializeEditor() {
       const editor_origin = monaco.editor.create(this.$refs.editorOrigin, {
-        value: '',
-        language: 'json',
-        theme: 'vs',
+        value: "",
+        language: "json",
+        theme: "vs",
       });
-      const editor_trans = monaco.editor.create(this.$refs.editorTrans, {
-        value: '',
-        language: 'json',
-        theme: 'vs',
+      monaco.editor.create(this.$refs.editorTrans, {
+        value: this.transContent,
+        language: "json",
+        theme: "vs",
       });
 
       editor_origin.onDidChangeModelContent(() => {
         const originValue = editor_origin.getValue();
-        console.log('Origin value:', originValue);
+        this.originalContent = originValue;
       });
-      editor_trans.onDidChangeModelContent(() => {
-        const transValue = editor_trans.getValue();
-        console.log('Trans value:', transValue);
-      });
-
-    }
+    },
+    updateExtraPrompt(value) {
+      this.extraPrompt = value;
+    },
   },
   setup() {
     let originalContent = ref("");
     let lang = ref(intlLanguages[1].value);
     let transContent = ref("");
     let extraPrompt = ref("");
-  
+
     const compress = (content) => {
       try {
         return JSON.stringify(JSON.parse(content));
@@ -153,14 +151,12 @@ export default {
           targetLang: lang,
           extraPrompt: extraPrompt,
           config:{
-            apiKey: "",
+            apiKey: "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",
             serviceProvider:"openai"
           },
         });
         transContent = prettierJson(data);
       } catch (error) {
-        editor_origin.value = '111'
-        console.log(editor_origin.value);
         console.log("translate service error!!");
       }
     };
@@ -173,9 +169,7 @@ export default {
       intlLanguages,
       requestTranslation,
       compress,
-      prettierJson,
-      updateExtraPrompt,
-      initializeEditor
+      prettierJson
     };
   },
 };
