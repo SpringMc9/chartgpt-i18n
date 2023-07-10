@@ -33,11 +33,6 @@ export async function translateService(req) {
 
   compressValuesInJson(locale, "", pairs);
   const { requireTranslation, noTranslation } = groupPairs(pairs);
-  // console.log({
-  //   pairs,
-  //   requireTranslation,
-  //   noTranslation,
-  // });
   const tasks = [];
   const CHUNK_SIZE = 1000;
   let chunk = [];
@@ -49,7 +44,6 @@ export async function translateService(req) {
       const freezeChunk = [...chunk];
       const finishedTask = await createChatCompletion(
         {
-          model: "gpt-3.5-turbo",
           messages: [
             ...messages,
             {
@@ -61,9 +55,11 @@ export async function translateService(req) {
         config
       )
         .then((completion) => {
-          return matchJSON(`${completion.choices[0].message?.content}`);
+          return matchJSON(completion);
         })
-        .then((raw) => JSON.parse(raw))
+        .then((raw) => {
+          return JSON.parse(raw);
+        })
         .then((r) => {
           if (r.length !== freezeChunk.length) {
             console.log("diff ", r, freezeChunk);
@@ -82,7 +78,6 @@ export async function translateService(req) {
   const freezeChunk = [...chunk];
   const ft = await createChatCompletion(
     {
-      model: "gpt-3.5-turbo",
       messages: [
         ...messages,
         {
@@ -94,9 +89,11 @@ export async function translateService(req) {
     config
   )
     .then((completion) => {
-      return matchJSON(`${completion.choices[0].message?.content}`);
+      return matchJSON(completion);
     })
-    .then((raw) => JSON.parse(raw))
+    .then((raw) => {
+      return JSON.parse(raw);
+    })
     .then((r) => {
       if (r.length !== freezeChunk.length) {
         console.log("diff ", r.length, freezeChunk.length);
@@ -115,6 +112,5 @@ export async function translateService(req) {
     .map((t, i) => [requireTranslation[i][0], t])
     .concat(noTranslation);
   const result = buildJsonByPairs(nextPairs);
-  // console.log(result);
   return result;
 }

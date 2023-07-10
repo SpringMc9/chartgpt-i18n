@@ -33,13 +33,13 @@ export const groupPairs = (pairs) => {
   };
 };
 
-export const createChatCompletion = async (props) => {
+export const createChatCompletion = async (props, config) => {
   let url =
     "https://ai-proxy.ksord.com/wps3.openai.azure.com/openai/deployments/gpt-35-turbo-version-0301/chat/completions?api-version=2023-03-15-preview";
   const headers = {
     "Content-Type": "application/json; charset=utf-8",
-    "Api-Key": "G4Q1R0jNruMDIzV0z32yEHaJxwDkNnnP",
   };
+  headers["Api-Key"] = `${config.apiKey}`;
   const response = await fetch(url, {
     method: "POST",
     headers,
@@ -57,32 +57,26 @@ export const createChatCompletion = async (props) => {
   if (response.status !== 200) {
     throw new Error("failed to create chat completion");
   }
-  return await response.json();
+  // 内部接口的返回数据的格式与openai不一样，需要进行调整转换
+  const responseBody = await response.text();
+  const lines = responseBody.split("\n");
+
+  const contents = lines.reduce((result, line) => {
+    if (line.startsWith("data:")) {
+      const jsonStr = line.substr("data:".length);
+      try {
+        const data = JSON.parse(jsonStr);
+        if (data.choices[0].delta.content) {
+          result.push(data.choices[0].delta.content);
+        }
+      } catch (error) {
+        //
+      }
+    }
+    return result;
+  }, []);
+  return await contents.join("");
 };
-// export const createChatCompletion = async (props, config) => {
-//   let url = "";
-//   const headers = {
-//     "Content-Type": "application/json",
-//   };
-//   if (config.serviceProvider === "openai") {
-//     url = "https://api.openai.com/v1/chat/completions";
-//     headers["Authorization"] = `Bearer ${config.apiKey}`;
-//   }
-//   console.log(props.messages);
-//   const response = await fetch(url, {
-//     method: "POST",
-//     headers,
-//     body: JSON.stringify({
-//       model: props.model,
-//       messages: props.messages,
-//       temperature: 0,
-//     }),
-//   });
-//   if (response.status !== 200) {
-//     throw new Error("failed to create chat completion");
-//   }
-//   return await response.json();
-// };
 
 export const matchJSON = (str) => {
   let start = 0;

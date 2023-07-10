@@ -115,7 +115,6 @@ export default {
           extraPrompt: extraPrompt.value,
           config: {
             apiKey: config.apiKey,
-            serviceProvider: "openai",
           },
         });
         transContent.value = prettierJson(data);
@@ -129,12 +128,6 @@ export default {
     onMounted(() => {
       initializeEditor();
     });
-
-    // onUpdated(() => {
-    //   if (transContent.value !== editor_trans.getValue()) {
-    //     editor_trans.setValue(transContent.value);
-    //   }
-    // });
 
     const copy2Clipboard = (content) => {
       navigator.clipboard.writeText(content);
