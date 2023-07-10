@@ -46,7 +46,6 @@ export async function exportLocalFiles(req) {
       const freezeChunk = [...chunk];
       const finishedTask = await createChatCompletion(
         {
-          model: "gpt-3.5-turbo",
           messages: [
             ...messages,
             {
@@ -58,9 +57,11 @@ export async function exportLocalFiles(req) {
         config
       )
         .then((completion) => {
-          return matchJSON(`${completion.choices[0].message?.content}`);
+          return matchJSON(completion);
         })
-        .then((raw) => JSON.parse(raw))
+        .then((raw) => {
+          JSON.parse(raw)
+        })
         .then((r) => {
           if (r.length !== freezeChunk.length) {
             console.log("diff ", r, freezeChunk);
@@ -79,7 +80,6 @@ export async function exportLocalFiles(req) {
   const freezeChunk = [...chunk];
   const ft = await createChatCompletion(
     {
-      model: "gpt-3.5-turbo",
       messages: [
         ...messages,
         {
@@ -91,9 +91,11 @@ export async function exportLocalFiles(req) {
     config
   )
     .then((completion) => {
-      return matchJSON(`${completion.choices[0].message?.content}`);
+      return matchJSON(completion);
     })
-    .then((raw) => JSON.parse(raw))
+    .then((raw) => {
+      return JSON.parse(raw);
+    })
     .then((r) => {
       if (r.length !== freezeChunk.length) {
         console.log("diff ", r.length, freezeChunk.length);
@@ -112,31 +114,17 @@ export async function exportLocalFiles(req) {
     .map((t, i) => [requireTranslation[i][0], t])
     .concat(noTranslation);
   const result = buildJsonByPairs(nextPairs);
-  // console.log(result);
+  console.log(result);
   return result;
 }
 
 export async function makeLocalesInZip(data, fileType) {
   const zipFileWriter = new BlobWriter();
   const zipWriter = new ZipWriter(zipFileWriter);
-  const addedFiles = {};
-  for (let item of data) {
-    const content = new TextReader(item.content);
-    const fileName = `locales.${fileType}`;
-    // 检查是否已经存在相同的文件名
-    if (addedFiles[fileName]) {
-      let suffix = 1;
-      while (addedFiles[`${fileName}_${suffix}`]) {
-        suffix++;
-      }
-      addedFiles[`${fileName}_${suffix}`] = true;
-    } else {
-      addedFiles[fileName] = true;
-    }
-    const contentReader = new TextReader(content);
-    // 添加文件到压缩包
-    await zipWriter.add(fileName, contentReader);
-  }
+  let suffix = 1;
+  const contentReader = new TextReader(data);
+  const fileName = `locales_${suffix}.${fileType}`;
+  await zipWriter.add(fileName, contentReader);
   const blob = await zipWriter.close();
   return new File([blob], `locales.${fileType}`);
 }
@@ -147,6 +135,5 @@ export function downloadFileFromBlob(content, fileName) {
   ele.setAttribute("download", fileName);
   ele.style.display = "none";
   document.body.appendChild(ele);
-  ele.click();
-  document.body.removeChild(ele);
+  ele.dispatchEvent(new MouseEvent('click'));
 }

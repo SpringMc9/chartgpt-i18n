@@ -109,9 +109,10 @@ export default {
 
     // Translate成文件按钮
     const handleTranslateToFile = () => {
-      context.emit('translate-to-files', props.originalContent); 
       console.log(props.originalContent);
+      context.emit('translate-to-files', props.originalContent); 
       downloadFiles()
+      closePopover()
     };
 
     const handleLangChange = (e) => {
@@ -127,7 +128,8 @@ export default {
 
     const downloadFiles = async () => {
       try {
-        const compressedContent = JSON.stringify(props.originalContent)
+        const compressedContent = JSON.stringify(JSON.parse(props.originalContent))
+        console.log(compressedContent);
         const res = await exportLocalFiles({
           content: compressedContent,
           targetLang: selectedRows,
@@ -137,7 +139,9 @@ export default {
             serviceProvider: "openai",
           },
         });
-        const data = JSON.stringify(res)
+        console.log(res);
+        const data = prettierJson(res)
+        console.log(data);
         const file = await makeLocalesInZip(data,"json");
         downloadFileFromBlob(file, "locales.zip");
       } catch (error) {
@@ -146,6 +150,15 @@ export default {
         show.value = false;
       }
     }
+
+    const prettierJson = (content) => {
+      if (typeof content !== "string") return JSON.stringify(content, null, 2);
+      try {
+        return JSON.stringify(JSON.parse(content), null, 2);
+      } catch (error) {
+        throw new Error("json is not valid");
+      }
+    };
 
     return {
       options,
