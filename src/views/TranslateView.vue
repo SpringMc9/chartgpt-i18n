@@ -17,7 +17,7 @@
       >
         Translate
       </button>
-      <ExportFiles :originalContent="originalContent" @translate-to-files="updateOriginalContent"/>
+      <ExportFiles :originalContent="originalContent" :extraPrompt="extraPrompt" @translate-to-files="updateOriginalContent"/>
     </div>
     <div class="text-field">
       <TextField

@@ -30,12 +30,12 @@
 
 <script>
 import { ref, nextTick } from "vue";
-import { intlLanguages } from "../type/type";
+import { intlLanguagesFormat } from "../type/type"
 import {
   downloadFileFromBlob,
-  exportLocalFiles,
   makeLocalesInZip,
 } from "../services/translatefiles";
+import { translateService } from "../services/translate";
 
 export default {
   name: "ExportFiles",
@@ -44,47 +44,19 @@ export default {
       type: String,
       required: true,
     },
+    extraPrompt:{
+      type: String,
+      required: false,
+    }
   },
   setup(props, context) {
-    // const originalContent = ref(props.originalContent);
-    const show = ref(false);
     const selectedLangs = ref([]);
     const popoverRef = ref(null);
     const singleTableRef = ref(null);
     let selectedRows = [];
     const configObject = localStorage.getItem("config");
     const config = JSON.parse(configObject);
-    const options = ref([
-      { language: "English | English " },
-      { language: "Spanish | Español" },
-      { language: "French | Français " },
-      { language: "German | Deutsch" },
-      { language: "Italian | Italiano " },
-      { language: "Japanese | 日本語" },
-      { language: "Korean | 한국어 " },
-      { language: "Portuguese | Português" },
-      { language: "Russian | Русский" },
-      { language: "Chinese | 中文" },
-      { language: "Arabic | العربية" },
-      { language: "Dutch | Nederlands" },
-      { language: "Greek | Ελληνικά" },
-      { language: "Hindi | हिन्दी" },
-      { language: "Indonesian | Bahasa Indonesia" },
-      { language: "Polish | Polski" },
-      { language: "Swedish | Svenska" },
-      { language: "Turkish | Türkçe" },
-      { language: "Vietnamese | Tiếng Việt" },
-      { language: "Danish | Dansk" },
-      { language: "Norwegian | Norsk" },
-      { language: "Finnish | Suomi" },
-      { language: "Czech | Čeština" },
-      { language: "Hungarian | Magyar" },
-      { language: "Romanian | Română" },
-      { language: "Thai | ไทย" },
-      { language: "Ukrainian | Українська" },
-      { language: "Hebrew | עברית" },
-      { language: "Persian | Farsi" },
-    ]);
+    const options = ref(intlLanguagesFormat);
     
     // 获取选择需要翻译的语言
     const handleSelectionChange = (val) => {
@@ -113,6 +85,27 @@ export default {
       downloadFiles()
     };
 
+    const downloadFiles = async () => {
+      try {
+        const compressedContent = JSON.stringify(JSON.parse(props.originalContent))
+        const res = await translateService({
+          content: compressedContent,
+          targetLang: selectedRows[0],
+          extraPrompt: props.extraPrompt.value,
+          config: {
+            apiKey: config.apiKey,
+          },
+        });
+        const data = prettierJson(res)
+        const file = await makeLocalesInZip(data,"json");
+        downloadFileFromBlob(file, "locales.zip");
+      } catch (error) {
+        console.log(error);
+      } finally {
+        closePopover()
+      }
+    }
+
     const prettierJson = (content) => {
       if (typeof content !== "string") return JSON.stringify(content, null, 2);
       try {
@@ -122,33 +115,11 @@ export default {
       }
     };
 
-    const downloadFiles = async () => {
-      try {
-        const compressedContent = JSON.stringify(JSON.parse(props.originalContent))
-        const res = await exportLocalFiles({
-          content: compressedContent,
-          targetLang: selectedRows,
-          extraPrompt:"",
-          config: {
-            apiKey: config.apiKey,
-          },
-        });
-        const data = prettierJson(res);
-        const file = await makeLocalesInZip(data,"json");
-        downloadFileFromBlob(file, "locales.zip");
-      } catch (error) {
-        console.log(error);
-      } finally {
-        show.value = false;
-      }
-    }
-
     return {
       options,
       popoverRef,
       singleTableRef,
       selectedLangs,
-      intlLanguages,
       downloadFiles,
       handleSelectionChange,
       handleTranslateToFile,
