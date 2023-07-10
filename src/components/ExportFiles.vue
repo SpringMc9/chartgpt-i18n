@@ -77,6 +77,14 @@ export default {
       { language: "Hebrew | עברית" },
       { language: "Persian | Farsi" },
     ]);
+
+    const compress = (content) => {
+      try {
+        return JSON.stringify(JSON.parse(content.value));
+      } catch (error) {
+        throw new Error("json is not valid");
+      }
+    };
     
     // 获取选择需要翻译的语言
     const handleSelectionChange = (val) => {
@@ -98,28 +106,9 @@ export default {
       console.log(selectedRows); 
     };
 
-    const handleLangChange = (e) => {
-      const { value, checked } = e.target;
-      if (checked) {
-        this.selectedLangs.value = [...this.selectedLangs.value, value];
-      } else {
-        this.selectedLangs.value = this.selectedLangs.value.filter(
-          (lang) => lang !== value
-        );
-      }
-    };
-
-    const compress = (content) => {
-      try {
-        return JSON.stringify(JSON.parse(content.value));
-      } catch (error) {
-        throw new Error("json is not valid");
-      }
-    };
-
     async function downloadFiles() {
       try {
-        const compressedContent = compress(originalContent.value);
+        const compressedContent = compress(originalContent);
         const res = await exportLocalFiles(
           compressedContent,
           selectedLangs.value
@@ -141,7 +130,6 @@ export default {
       selectedLangs,
       intlLanguages,
       downloadFiles,
-      handleLangChange,
       handleSelectionChange,
       handleTranslateToFile,
       closePopover,
