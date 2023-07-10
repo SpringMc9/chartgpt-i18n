@@ -17,7 +17,7 @@
       >
         Translate
       </button>
-      <ExportFiles :originalContent="originalContent" />
+      <ExportFiles :originalContent="originalContent" @translate-to-files="updateOriginalContent"/>
     </div>
     <div class="text-field">
       <TextField
@@ -105,6 +105,10 @@ export default {
       extraPrompt = value;
     };
 
+    const updateOriginalContent = () => {
+      originalContent.value = editor_origin.getValue()
+    }
+
     // 翻译请求
     const requestTranslation = async () => {
       try {
@@ -159,6 +163,7 @@ export default {
       intlLanguages,
       editor_origin,
       editor_trans,
+      updateOriginalContent,
       requestTranslation,
       updateExtraPrompt,
       copy2Clipboard,

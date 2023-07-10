@@ -8,6 +8,7 @@ import { buildJsonByPairs } from "../../api/utils/utils";
 
 export async function translateService(req) {
   const { config, content, targetLang, extraPrompt } = req;
+  console.log(targetLang);
   const messages = [
     {
       role: "system",

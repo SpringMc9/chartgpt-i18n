@@ -39,13 +39,21 @@ import {
 
 export default {
   name: "ExportFiles",
-  setup(props) {
-    const originalContent = ref(props.originalContent);
+  props: {
+    originalContent:{
+      type: String,
+      required: true,
+    },
+  },
+  setup(props, context) {
+    // const originalContent = ref(props.originalContent);
     const show = ref(false);
     const selectedLangs = ref([]);
     const popoverRef = ref(null);
     const singleTableRef = ref(null);
     let selectedRows = [];
+    const configObject = localStorage.getItem("config");
+    const config = JSON.parse(configObject);
     const options = ref([
       { language: "English | English " },
       { language: "Spanish | Español" },
@@ -77,19 +85,17 @@ export default {
       { language: "Hebrew | עברית" },
       { language: "Persian | Farsi" },
     ]);
-
-    const compress = (content) => {
-      try {
-        return JSON.stringify(JSON.parse(content.value));
-      } catch (error) {
-        throw new Error("json is not valid");
-      }
-    };
     
     // 获取选择需要翻译的语言
     const handleSelectionChange = (val) => {
-      // 将选择的语言存储在数组
-      selectedRows = val
+      // 遍历 val 数组中的每个子元素
+      val.forEach((selectedObject) => {
+        // 获取语言属性的第一个值
+        const language = Reflect.get(selectedObject, 'language').split('|')[0].trim();
+        selectedRows.push(language)
+      });
+      // 数组去重
+      selectedRows = Array.from(new Set(selectedRows));
     };
 
     // 关闭弹框
@@ -103,17 +109,32 @@ export default {
 
     // Translate成文件按钮
     const handleTranslateToFile = () => {
-      console.log(selectedRows); 
+      context.emit('translate-to-files', props.originalContent); 
+      downloadFiles()
     };
 
-    async function downloadFiles() {
+    const prettierJson = (content) => {
+      if (typeof content !== "string") return JSON.stringify(content, null, 2);
       try {
-        const compressedContent = compress(originalContent);
-        const res = await exportLocalFiles(
-          compressedContent,
-          selectedLangs.value
-        );
-        const file = await makeLocalesInZip(res,"json");
+        return JSON.stringify(JSON.parse(content), null, 2);
+      } catch (error) {
+        throw new Error("json is not valid");
+      }
+    };
+
+    const downloadFiles = async () => {
+      try {
+        const compressedContent = JSON.stringify(JSON.parse(props.originalContent))
+        const res = await exportLocalFiles({
+          content: compressedContent,
+          targetLang: selectedRows,
+          extraPrompt:"",
+          config: {
+            apiKey: config.apiKey,
+          },
+        });
+        const data = prettierJson(res);
+        const file = await makeLocalesInZip(data,"json");
         downloadFileFromBlob(file, "locales.zip");
       } catch (error) {
         console.log(error);
@@ -123,7 +144,6 @@ export default {
     }
 
     return {
-      show,
       options,
       popoverRef,
       singleTableRef,
@@ -139,7 +159,7 @@ export default {
 </script>
 <style>
 .modal-popover {
-  height: 700px !important;
+  height: 600px !important;
   overflow-y: auto !important;
   margin-top: 20px;
 }
