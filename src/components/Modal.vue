@@ -50,7 +50,7 @@ export default {
     },
     onClose: {
       type: Function,
-      required: true,
+      required: false,
     },
     onConfirm: {
       type: Function,
