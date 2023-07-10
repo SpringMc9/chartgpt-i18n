@@ -1,58 +1,35 @@
 <template>
-  <span>
-    <button
-      type="button"
-      class=""
-      @click="handleShowChange"
+  <el-popover
+    placement="right"
+    popper-class="modal-popover"
+    :width="400"
+    trigger="click"
+    ref="popoverRef"
+  >
+    <template #reference>
+      <el-button class="translate_files" style="margin-right: 16px"
+        >Translate to files</el-button
+      >
+    </template>
+    <el-table
+      ref="singleTableRef"
+      :data="options"
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
+      class="staticTable"
     >
-      Translate to files
+      <el-table-column property="language" label="Language" width="300" />
+      <el-table-column type="selection" width="55" />
+    </el-table>
+    <button class="modal_button" @click="closePopover()">Close</button>
+    <button class="modal_button" @click="handleTranslateToFile()">
+      Translate
     </button>
-    <Modal :open="show" @close="show = false" @confirm="downloadFiles">
-      <fieldset>
-        <legend class="text-base font-semibold leading-6 text-gray-50">
-          Languages
-        </legend>
-        <div
-          class="mt-4 divide-y divide-gray-600 border-t border-b border-gray-600"
-        >
-          <div
-            v-for="(lang, personIdx) in intlLanguages"
-            :key="personIdx"
-            class="relative flex items-start py-2"
-          >
-            <div class="min-w-0 flex-1 text-sm leading-6">
-              <label
-                :for="`person-${lang.value}`"
-                class="select-none font-medium text-gray-50"
-              >
-                {{ lang.label }} | {{ lang.value }}
-              </label>
-            </div>
-            <div class="ml-3 flex h-6 items-center">
-              <input
-                :checked="selectedLangs.includes(lang.value)"
-                :id="`person-${lang.value}`"
-                :name="`person-${lang.value}`"
-                :value="lang.value"
-                type="checkbox"
-                class="h-4 w-4 rounded bg-gray-900 border-gray-500 text-indigo-600 focus:ring-indigo-600"
-                @change="handleLangChange"
-              />
-            </div>
-          </div>
-        </div>
-      </fieldset>
-      <div v-if="loading" class="flex justify-center py-2">
-        <Spinner />
-        <h2 class="text-base font-white">Generate locale files</h2>
-      </div>
-    </Modal>
-  </span>
+  </el-popover>
 </template>
 
 <script>
-import { ref } from "vue";
-import Modal from "./Modal";
+import { ref, nextTick } from "vue";
 import { intlLanguages } from "../type/type";
 import {
   downloadFileFromBlob,
@@ -61,12 +38,67 @@ import {
 } from "../services/translatefiles";
 
 export default {
-  name:"ExportFiles",
-  components: {
-    Modal,
-  },
-  methods: {
-    handleLangChange(e) {
+  name: "ExportFiles",
+  setup(props) {
+    const originalContent = ref(props.originalContent);
+    const show = ref(false);
+    const selectedLangs = ref([]);
+    const popoverRef = ref(null);
+    const singleTableRef = ref(null);
+    let selectedRows = [];
+    const options = ref([
+      { language: "English | English " },
+      { language: "Spanish | Español" },
+      { language: "French | Français " },
+      { language: "German | Deutsch" },
+      { language: "Italian | Italiano " },
+      { language: "Japanese | 日本語" },
+      { language: "Korean | 한국어 " },
+      { language: "Portuguese | Português" },
+      { language: "Russian | Русский" },
+      { language: "Chinese | 中文" },
+      { language: "Arabic | العربية" },
+      { language: "Dutch | Nederlands" },
+      { language: "Greek | Ελληνικά" },
+      { language: "Hindi | हिन्दी" },
+      { language: "Indonesian | Bahasa Indonesia" },
+      { language: "Polish | Polski" },
+      { language: "Swedish | Svenska" },
+      { language: "Turkish | Türkçe" },
+      { language: "Vietnamese | Tiếng Việt" },
+      { language: "Danish | Dansk" },
+      { language: "Norwegian | Norsk" },
+      { language: "Finnish | Suomi" },
+      { language: "Czech | Čeština" },
+      { language: "Hungarian | Magyar" },
+      { language: "Romanian | Română" },
+      { language: "Thai | ไทย" },
+      { language: "Ukrainian | Українська" },
+      { language: "Hebrew | עברית" },
+      { language: "Persian | Farsi" },
+    ]);
+    
+    // 获取选择需要翻译的语言
+    const handleSelectionChange = (val) => {
+      // 将选择的语言存储在数组
+      selectedRows = val
+    };
+
+    // 关闭弹框
+    const closePopover = () => {
+      nextTick(() => {
+        if (popoverRef.value) {
+          popoverRef.value.hide();
+        }
+      }); 
+    }
+
+    // Translate成文件按钮
+    const handleTranslateToFile = () => {
+      console.log(selectedRows); 
+    };
+
+    const handleLangChange = (e) => {
       const { value, checked } = e.target;
       if (checked) {
         this.selectedLangs.value = [...this.selectedLangs.value, value];
@@ -75,15 +107,7 @@ export default {
           (lang) => lang !== value
         );
       }
-    },
-    handleShowChange() {
-      this.show = true;
-    }
-  },
-  setup(props) {
-    const originalContent = ref(props.originalContent);
-    const show = ref(false);
-    const selectedLangs = ref([]);
+    };
 
     const compress = (content) => {
       try {
@@ -111,10 +135,50 @@ export default {
 
     return {
       show,
+      options,
+      popoverRef,
+      singleTableRef,
       selectedLangs,
-      downloadFiles,
       intlLanguages,
+      downloadFiles,
+      handleLangChange,
+      handleSelectionChange,
+      handleTranslateToFile,
+      closePopover,
     };
   },
 };
 </script>
+<style>
+.modal-popover {
+  height: 700px !important;
+  overflow-y: auto !important;
+  margin-top: 20px;
+}
+.el-table__header-wrapper .el-checkbox__inner {
+  display: none;
+}
+.translate_files {
+  width: 150px;
+  height: 33px;
+  margin-left: 20px;
+  border-radius: 7px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background-color: rgb(20, 153, 242);
+  border: 2px solid rgb(20, 153, 242);
+}
+.modal_button {
+  width: 135px;
+  height: 33px;
+  margin-top: 13px;
+  margin-left: 31px;
+  border-radius: 7px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background-color: rgb(20, 153, 242);
+  border: 2px solid rgb(20, 153, 242);
+}
+</style>
