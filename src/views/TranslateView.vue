@@ -17,10 +17,7 @@
       >
         Translate
       </el-button>
-      <ExportFiles
-        :originalContent="originalContent"
-        @translate-to-files="updateOriginalContent"
-      />
+      <ExportFiles :originalContent="originalContent" :extraPrompt="extraPrompt" @translate-to-files="updateOriginalContent"/>
     </div>
     <div class="text-field">
       <TextField
@@ -79,7 +76,7 @@ export default {
     const originalContent = ref("");
     let lang = ref(intlLanguages[0].value);
     const transContent = ref("");
-    let extraPrompt = ref("");
+    const extraPrompt = ref("");
     const editorOrigin = ref(null);
     const editorTrans = ref(null);
     let editor_origin = null;
@@ -104,7 +101,7 @@ export default {
       });
     };
     const updateExtraPrompt = (value) => {
-      extraPrompt = value;
+      extraPrompt.value = value;
     };
 
     const updateOriginalContent = () => {

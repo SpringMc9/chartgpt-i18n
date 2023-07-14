@@ -91,8 +91,8 @@ export default {
         const res = await translateAndExportFiles({
           content: compressedContent,
           targetLang: selectedRows,
-          extraPrompt: "", // 传参进来！！
-        });
+          extraPrompt: props.extraPrompt,
+        }) 
         console.log(res);
       } catch (error) {
         console.log(error);
