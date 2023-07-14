@@ -46,7 +46,6 @@ export default {
     }
   },
   setup(props, context) {
-    const show = ref(false);
     const selectedLangs = ref([]);
     const popoverRef = ref(null);
     const selectAllTag = ref(0);
@@ -127,6 +126,7 @@ export default {
       downloadFiles,
       handleSelectionChange,
       handleTranslateToFile,
+      handleLangChange,
       closePopover,
     };
   },
