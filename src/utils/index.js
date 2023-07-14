@@ -3,7 +3,7 @@ export const compressValuesInJson = (conentJson, path, pairs) => {
     Object.keys(conentJson).forEach((k) => {
       let p = path;
       if (p.length !== 0) {
-        p += ".";
+        p += "!!";
       }
       p += k;
       if (typeof conentJson[k] !== "object") {
@@ -61,7 +61,7 @@ export const createChatCompletion = async (props, config) => {
   const responseBody = await response.text();
   const lines = responseBody.split("\n");
 
-  const contents = lines.reduce((result, line) => {
+  let contents = lines.reduce((result, line) => {
     if (line.startsWith("data:")) {
       const jsonStr = line.substr("data:".length);
       try {
@@ -75,6 +75,21 @@ export const createChatCompletion = async (props, config) => {
     }
     return result;
   }, []);
+  // 检查最后一条json是不是被完整翻译
+  if (contents[contents.length - 1] !== '"]]') {
+    let index = contents.lastIndexOf('"],["');
+    const index1 = contents.lastIndexOf('["');
+    index = index > index1 ? index : index1;
+    if (index !== -1) {
+      if (contents[index] === '"],["') {
+        contents = contents.slice(0, index);
+        contents.push('"]]');
+      } else if (contents[index] === '["') {
+        contents = contents.slice(0, index - 1);
+        contents.push('"]]');
+      }
+    }
+  }
   return await contents.join("");
 };
 

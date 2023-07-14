@@ -141,6 +141,7 @@ export default {
       try {
         return JSON.stringify(JSON.parse(content.value));
       } catch (error) {
+        // message.error("不是正确的json格式，请重新输入")
         throw new Error("json is not valid");
       }
     };

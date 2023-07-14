@@ -11,21 +11,27 @@ export async function translateService(req) {
   const messages = [
     {
       role: "system",
-      content: `You are a helpful assistant that translates a i18n locale array content to ${targetLang}.   
-            It's a array structure, contains many strings, translate each of them and make a new array of translated strings.  
+      // content: `You are a helpful assistant that translates a i18n locale array content to ${targetLang}.
+      //       It's a array structure, contains many strings, translate each of them and make a new array of translated strings.
+      //       Consider all the string as a context to make better translation.\n`,
+      content: `You are a helpful assistant that translates a i18n locale key-value objects to ${targetLang}.
+            It's a key-value objects, contains many key-value values, translate each of them and make a new array of translated strings.
             Consider all the string as a context to make better translation.\n`,
     },
   ];
   if (typeof extraPrompt === "string" && extraPrompt.length > 0) {
     messages.push({
       role: "user",
+      // content: `Other tips for translation: ${extraPrompt}\n
+      //       Translate this array: \n\n\n`,
       content: `Other tips for translation: ${extraPrompt}\n  
-            Translate this array: \n\n\n`,
+            Translate this key-value object: \n\n\n`,
     });
   } else {
     messages.push({
       role: "user",
-      content: `Translate this array: \n\n\n`,
+      // content: `Translate this array: \n\n\n`,
+      content: `Translate this key-value object: \n\n\n`,
     });
   }
   const pairs = [];
@@ -34,13 +40,13 @@ export async function translateService(req) {
   compressValuesInJson(locale, "", pairs);
   const { requireTranslation, noTranslation } = groupPairs(pairs);
   const tasks = [];
-  const CHUNK_SIZE = 1000;
+  const CHUNK_SIZE = 60; // 一次翻译的最大长度
   let chunk = [];
-  let chunkSize = 0;
+
   for (let i = 0; i < requireTranslation.length; i++) {
-    chunk.push(requireTranslation[i][1]);
-    chunkSize += requireTranslation[i][1].length;
-    if (chunkSize >= CHUNK_SIZE) {
+    // chunk.push(requireTranslation[i][1]);
+    chunk.push(requireTranslation[i]);
+    if (chunk.length >= CHUNK_SIZE) {
       const freezeChunk = [...chunk];
       const finishedTask = await createChatCompletion(
         {
@@ -62,16 +68,17 @@ export async function translateService(req) {
         })
         .then((r) => {
           if (r.length !== freezeChunk.length) {
-            console.log("diff ", r, freezeChunk);
+            // message.error("返回数据数量不正确，请重新翻译")
+            console.log("diff ", r.length, freezeChunk.length);
           }
           return r;
         })
         .catch((err) => {
           console.log(err);
+          // message.error("翻译失败，请重新翻译")
           return freezeChunk;
         });
       chunk = [];
-      chunkSize = 0;
       tasks.push(finishedTask);
     }
   }
@@ -96,21 +103,22 @@ export async function translateService(req) {
     })
     .then((r) => {
       if (r.length !== freezeChunk.length) {
+        // message.error("返回数据数量不正确，请重新翻译")
         console.log("diff ", r.length, freezeChunk.length);
       }
       return r;
     })
     .catch((err) => {
       console.log(err);
+      // message.error("翻译失败，请重新翻译")
       return freezeChunk;
     });
   tasks.push(ft);
-  chunk = [];
-  chunkSize = 0;
   const translated = (await Promise.all(tasks)).flatMap((t) => t);
-  const nextPairs = translated
-    .map((t, i) => [requireTranslation[i][0], t])
-    .concat(noTranslation);
+  // const nextPairs = translated
+  //   .map((t, i) => [requireTranslation[i][0], t])
+  //   .concat(noTranslation);
+  const nextPairs = translated.concat(noTranslation);
   const result = buildJsonByPairs(nextPairs);
   return result;
 }

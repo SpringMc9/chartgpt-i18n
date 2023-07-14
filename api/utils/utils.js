@@ -2,7 +2,7 @@ export const buildJsonByPairs = (pairs) => {
   let ans = {};
   for (let pair of pairs) {
     const path = pair[0];
-    const keys = path.split(".");
+    const keys = path.split("!!");
     let kIndex = 0;
     let node = ans;
     while (kIndex < keys.length - 1) {
