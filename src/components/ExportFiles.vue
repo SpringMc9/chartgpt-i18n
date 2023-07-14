@@ -104,7 +104,7 @@ export default {
         const res = await translateAndExportFiles({
           content: compressedContent,
           targetLang: selectedRows,
-          extraPrompt: "",
+          extraPrompt: props.extraPrompt,
           config: {
             apiKey: config.apiKey,
           },

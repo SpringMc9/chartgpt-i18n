@@ -13,7 +13,6 @@ export async function translateAndExportFiles(req) {
   const { config, content, targetLang, extraPrompt } = req;
   const translations = [];
   for (let i = 0; i < targetLang.length; i++) {
-    console.log("语言",targetLang[i]);
     const messages = [
       {
         role: "system",
@@ -121,7 +120,6 @@ export async function translateAndExportFiles(req) {
     const data = prettierJson(result)
     translations.push(data)  
   }
-  console.log(translations);
   const zipBlob = await makeLocalesInZip(translations, targetLang);
   downloadFileFromBlob(zipBlob, "locales.zip");
 }
