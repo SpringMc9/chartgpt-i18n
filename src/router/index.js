@@ -1,16 +1,11 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import SettingView from "../views/SettingView.vue";
+import TranslateView from "../views/TranslateView.vue";
 
 const routes = [
   {
     path: "/",
-    name: "setting",
-    component: SettingView,
-  },
-  {
-    path: "/translate",
     name: "translate",
-    component: () => import("../views/TranslateView.vue"),
+    component: TranslateView,
   },
 ];
 

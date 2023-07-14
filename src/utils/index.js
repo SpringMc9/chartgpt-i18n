@@ -33,13 +33,13 @@ export const groupPairs = (pairs) => {
   };
 };
 
-export const createChatCompletion = async (props, config) => {
+export const createChatCompletion = async (props) => {
   let url =
     "https://ai-proxy.ksord.com/wps3.openai.azure.com/openai/deployments/gpt-35-turbo-version-0301/chat/completions?api-version=2023-03-15-preview";
   const headers = {
+    "Api-Key": "G4Q1R0jNruMDIzV0z32yEHaJxwDkNnnP",
     "Content-Type": "application/json; charset=utf-8",
   };
-  headers["Api-Key"] = `${config.apiKey}`;
   const response = await fetch(url, {
     method: "POST",
     headers,

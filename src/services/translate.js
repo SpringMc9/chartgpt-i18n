@@ -7,7 +7,7 @@ import {
 import { buildJsonByPairs } from "../../api/utils/utils";
 
 export async function translateService(req) {
-  const { config, content, targetLang, extraPrompt } = req;
+  const { content, targetLang, extraPrompt } = req;
   const messages = [
     {
       role: "system",
@@ -42,25 +42,22 @@ export async function translateService(req) {
   const tasks = [];
   const CHUNK_SIZE = 60; // 一次翻译的最大长度
   let chunk = [];
-
   for (let i = 0; i < requireTranslation.length; i++) {
     // chunk.push(requireTranslation[i][1]);
     chunk.push(requireTranslation[i]);
     if (chunk.length >= CHUNK_SIZE) {
       const freezeChunk = [...chunk];
-      const finishedTask = await createChatCompletion(
-        {
-          messages: [
-            ...messages,
-            {
-              role: "user",
-              content: JSON.stringify(freezeChunk),
-            },
-          ],
-        },
-        config
-      )
+      const finishedTask = await createChatCompletion({
+        messages: [
+          ...messages,
+          {
+            role: "user",
+            content: JSON.stringify(freezeChunk),
+          },
+        ],
+      })
         .then((completion) => {
+          console.log(completion);
           return matchJSON(completion);
         })
         .then((raw) => {
@@ -83,18 +80,15 @@ export async function translateService(req) {
     }
   }
   const freezeChunk = [...chunk];
-  const ft = await createChatCompletion(
-    {
-      messages: [
-        ...messages,
-        {
-          role: "user",
-          content: JSON.stringify(freezeChunk),
-        },
-      ],
-    },
-    config
-  )
+  const ft = await createChatCompletion({
+    messages: [
+      ...messages,
+      {
+        role: "user",
+        content: JSON.stringify(freezeChunk),
+      },
+    ],
+  })
     .then((completion) => {
       return matchJSON(completion);
     })

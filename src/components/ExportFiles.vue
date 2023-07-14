@@ -7,19 +7,19 @@
     ref="popoverRef"
   >
     <template #reference>
-      <el-button class="translate_files" style="margin-right: 16px"
-        >Translate to files</el-button
-      >
+      <el-button class="translate_files" style="margin-right: 16px">
+        Translate to files
+      </el-button>
     </template>
     <el-table
       ref="singleTableRef"
-      :data="options"
+      :data="translateOptions"
       style="width: 100%"
       @selection-change="handleSelectionChange"
       class="staticTable"
     >
       <el-table-column property="language" label="Language" width="300" />
-      <el-table-column type="selection" width="55" />
+      <el-table-column type="selection" width="55" ref="selectAll" />
     </el-table>
     <button class="modal_button" @click="closePopover()">Close</button>
     <button class="modal_button" @click="handleTranslateToFile()">
@@ -30,96 +30,82 @@
 
 <script>
 import { ref, nextTick } from "vue";
-import { intlLanguagesFormat } from "../type/type"
-import {
-  downloadFileFromBlob,
-  makeLocalesInZip,
-} from "../services/translatefiles";
-import { translateService } from "../services/translate";
+import { translateAndExportFiles } from "../services/translatefiles";
+import { translateOptions } from "../type/type";
 
 export default {
   name: "ExportFiles",
   props: {
-    originalContent:{
+    originalContent: {
       type: String,
       required: true,
     },
-    extraPrompt:{
+    extraPrompt: {
       type: String,
       required: false,
-    }
+    },
   },
   setup(props, context) {
-    const selectedLangs = ref([]);
     const popoverRef = ref(null);
+    const selectAllTag = ref(0);
     const singleTableRef = ref(null);
     let selectedRows = [];
-    const configObject = localStorage.getItem("config");
-    const config = JSON.parse(configObject);
-    const options = ref(intlLanguagesFormat);
-    
+
     // 获取选择需要翻译的语言
     const handleSelectionChange = (val) => {
-      // 遍历 val 数组中的每个子元素
       val.forEach((selectedObject) => {
-        // 获取语言属性的第一个值
-        const language = Reflect.get(selectedObject, 'language').split('|')[0].trim();
-        selectedRows.push(language)
+        const language = Reflect.get(selectedObject, "language")
+          .split("|")[0]
+          .trim();
+        selectedRows.push(language);
       });
-      // 数组去重
       selectedRows = Array.from(new Set(selectedRows));
+      if (selectedRows.length == translateOptions.length) {
+        selectAllTag.value += 1;
+        if (selectAllTag.value == 2) {
+          selectedRows = [];
+          selectAllTag.value = 0;
+        }
+      }
     };
-
     // 关闭弹框
     const closePopover = () => {
       nextTick(() => {
         if (popoverRef.value) {
           popoverRef.value.hide();
         }
-      }); 
-    }
-
+      });
+    };
     // Translate成文件按钮
     const handleTranslateToFile = () => {
-      context.emit('translate-to-files', props.originalContent); 
-      downloadFiles()
+      context.emit("translate-to-files", props.originalContent);
+      closePopover();
+      downloadFiles();
     };
 
     const downloadFiles = async () => {
       try {
-        const compressedContent = JSON.stringify(JSON.parse(props.originalContent))
-        const res = await translateService({
+        const compressedContent = JSON.stringify(
+          JSON.parse(props.originalContent)
+        );
+        const res = await translateAndExportFiles({
           content: compressedContent,
-          targetLang: selectedRows[0],
-          extraPrompt: props.extraPrompt.value,
-          config: {
-            apiKey: config.apiKey,
-          },
+          targetLang: selectedRows,
+          extraPrompt: "", // 传参进来！！
         });
-        const data = prettierJson(res)
-        const file = await makeLocalesInZip(data,"json");
-        downloadFileFromBlob(file, "locales.zip");
+        console.log(res);
       } catch (error) {
         console.log(error);
       } finally {
-        closePopover()
-      }
-    }
-
-    const prettierJson = (content) => {
-      if (typeof content !== "string") return JSON.stringify(content, null, 2);
-      try {
-        return JSON.stringify(JSON.parse(content), null, 2);
-      } catch (error) {
-        throw new Error("json is not valid");
+        closePopover();
       }
     };
 
     return {
-      options,
       popoverRef,
       singleTableRef,
-      selectedLangs,
+      selectAllTag,
+      translateOptions,
       downloadFiles,
       handleSelectionChange,
       handleTranslateToFile,
@@ -128,15 +114,7 @@ export default {
   },
 };
 </script>
-<style>
-.modal-popover {
-  height: 600px !important;
-  overflow-y: auto !important;
-  margin-top: 20px;
-}
-.el-table__header-wrapper .el-checkbox__inner {
-  display: none;
-}
+<style scoped lang="scss">
 .translate_files {
   width: 150px;
   height: 33px;
@@ -148,6 +126,12 @@ export default {
   background-color: rgb(20, 153, 242);
   border: 2px solid rgb(20, 153, 242);
 }
+.translate_files:hover {
+  background-color: #eaf6ff;
+  color: rgb(20, 153, 242);
+  border: 1px solid rgb(20, 153, 242);
+}
+
 .modal_button {
   width: 135px;
   height: 33px;
