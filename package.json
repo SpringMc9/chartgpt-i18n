@@ -13,6 +13,7 @@
     "@heroicons/vue": "^1.0.6",
     "@vue/reactivity": "^3.3.4",
     "@zip.js/zip.js": "^2.7.17",
+    "ant-design-vue": "^3.2.20",
     "core-js": "^3.8.3",
     "element-plus": "^2.3.7",
     "element-ui": "^2.15.13",

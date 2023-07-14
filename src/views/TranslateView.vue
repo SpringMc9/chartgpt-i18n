@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="content-header">
-      <select class="select" v-model="lang">
+      <select class="selectOption" v-model="lang">
         <option
           v-for="option in intlLanguages"
           :value="option.value"
@@ -10,13 +10,13 @@
           {{ option.label }}
         </option>
       </select>
-      <button
+      <el-button
         type="button"
         class="translate-button"
         @click="requestTranslation"
       >
         Translate
-      </button>
+      </el-button>
       <ExportFiles :originalContent="originalContent" @translate-to-files="updateOriginalContent"/>
     </div>
     <div class="text-field">
@@ -62,6 +62,8 @@ import ExportFiles from "../components/ExportFiles";
 import { translateService } from "../services/translate";
 import { intlLanguages } from "../type/type";
 import { DocumentDuplicateIcon } from "@heroicons/vue/outline";
+import { message } from "ant-design-vue"
+import 'ant-design-vue/dist/antd.css';
 
 export default {
   name: "TranslateView",
@@ -72,7 +74,7 @@ export default {
   },
   setup() {
     const originalContent = ref("");
-    let lang = ref(intlLanguages[1].value);
+    let lang = ref(intlLanguages[0].value);
     const transContent = ref("");
     let extraPrompt = ref("");
     const editorOrigin = ref(null);
@@ -112,7 +114,6 @@ export default {
     // 翻译请求
     const requestTranslation = async () => {
       try {
-        console.log(originalContent);
         const compressedContent = compress(originalContent);
         console.log(compressedContent);
         const data = await translateService({
@@ -124,7 +125,7 @@ export default {
           },
         });
         transContent.value = prettierJson(data);
-        editor_trans.setValue(transContent.value);
+        editor_trans.setValue(transContent.value)
       } catch (error) {
         console.log(error);
         console.log("translate service error!!");
@@ -135,8 +136,15 @@ export default {
       initializeEditor();
     });
 
+    // 复制翻译结果
     const copy2Clipboard = (content) => {
-      navigator.clipboard.writeText(content);
+      navigator.clipboard.writeText(content)
+      .then(() => {
+        message.success('已成功复制到剪贴板');
+      })
+      .catch(() => {
+        message.error('复制到剪贴板失败');
+      });
     };
 
     const compress = (content) => {
@@ -179,13 +187,16 @@ export default {
   display: inline-block;
   .content-header {
     display: inline-block;
-    .select {
+    .selectOption {
       width: 100px;
       height: 33px;
       font-size: 16px;
       border-radius: 7px;
       border: none;
       outline: none;
+    }
+    .selectOption option:hover {
+      background-color: aqua;
     }
 
     .translate-button {
@@ -198,6 +209,11 @@ export default {
       color: #fff;
       background-color: rgb(20, 153, 242);
       border: 2px solid rgb(20, 153, 242);
+    }
+    .translate-button:hover {
+      background-color: #EAF6FF;
+      color: rgb(20, 153, 242);
+      border: 1px solid rgb(20, 153, 242);
     }
   }
   .text-field {
@@ -219,8 +235,8 @@ export default {
       margin: 5px 0;
     }
     .original-locale {
-      width: 601px;
-      height: 685px;
+      width: 606px;
+      height: 696px;
       border-radius: 7px;
       border: 2px solid black;
 
@@ -231,9 +247,9 @@ export default {
     }
 
     .translated-locale {
-      width: 601px;
+      width: 606px;
       margin-left: 10px;
-      height: 685px;
+      height: 696px;
       border-radius: 7px;
       border: 2px solid black;
 

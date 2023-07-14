@@ -1,7 +1,6 @@
 <template>
   <nav>
-    <router-link to="/">Setting</router-link> |
-    <router-link to="/translate">Translate</router-link>
+    <router-link to="/">Translate</router-link>
   </nav>
   <router-view/>
 </template>
@@ -19,14 +18,20 @@
 
 nav {
   padding: 30px;
-
   a {
     font-weight: bold;
     color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #CCCCCC;
-    }
+    font-size: 30px;
   }
+}
+.el-popover {
+  height: 600px;
+  overflow-y: auto;
+  margin-top: 20px;
+}
+.select option:hover {
+  /* 修改鼠标停留在 option 元素时的样式 */
+  background-color: #dc1e1e;
+  cursor: pointer;
 }
 </style>

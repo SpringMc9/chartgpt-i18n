@@ -7,19 +7,19 @@
     ref="popoverRef"
   >
     <template #reference>
-      <el-button class="translate_files" style="margin-right: 16px"
-        >Translate to files</el-button
-      >
+      <el-button class="translate_files" style="margin-right: 16px">
+        Translate to files
+      </el-button>
     </template>
     <el-table
       ref="singleTableRef"
-      :data="options"
+      :data="translateOptions"
       style="width: 100%"
       @selection-change="handleSelectionChange"
       class="staticTable"
     >
       <el-table-column property="language" label="Language" width="300" />
-      <el-table-column type="selection" width="55" />
+      <el-table-column type="selection" width="55" ref="selectAll" />
     </el-table>
     <button class="modal_button" @click="closePopover()">Close</button>
     <button class="modal_button" @click="handleTranslateToFile()">
@@ -30,89 +30,57 @@
 
 <script>
 import { ref, nextTick } from "vue";
-import { intlLanguages } from "../type/type";
-import {
-  downloadFileFromBlob,
-  exportLocalFiles,
-  makeLocalesInZip,
-} from "../services/translatefiles";
+import { translateAndExportFiles } from "../services/translatefiles";
+import { translateOptions } from "../type/type";
 
 export default {
   name: "ExportFiles",
   props: {
-    originalContent:{
+    originalContent: {
       type: String,
       required: true,
     },
   },
   setup(props, context) {
-    // const originalContent = ref(props.originalContent);
     const show = ref(false);
     const selectedLangs = ref([]);
     const popoverRef = ref(null);
+    const selectAllTag = ref(0);
     const singleTableRef = ref(null);
     let selectedRows = [];
     const configObject = localStorage.getItem("config");
     const config = JSON.parse(configObject);
-    const options = ref([
-      { language: "English | English " },
-      { language: "Spanish | Español" },
-      { language: "French | Français " },
-      { language: "German | Deutsch" },
-      { language: "Italian | Italiano " },
-      { language: "Japanese | 日本語" },
-      { language: "Korean | 한국어 " },
-      { language: "Portuguese | Português" },
-      { language: "Russian | Русский" },
-      { language: "Chinese | 中文" },
-      { language: "Arabic | العربية" },
-      { language: "Dutch | Nederlands" },
-      { language: "Greek | Ελληνικά" },
-      { language: "Hindi | हिन्दी" },
-      { language: "Indonesian | Bahasa Indonesia" },
-      { language: "Polish | Polski" },
-      { language: "Swedish | Svenska" },
-      { language: "Turkish | Türkçe" },
-      { language: "Vietnamese | Tiếng Việt" },
-      { language: "Danish | Dansk" },
-      { language: "Norwegian | Norsk" },
-      { language: "Finnish | Suomi" },
-      { language: "Czech | Čeština" },
-      { language: "Hungarian | Magyar" },
-      { language: "Romanian | Română" },
-      { language: "Thai | ไทย" },
-      { language: "Ukrainian | Українська" },
-      { language: "Hebrew | עברית" },
-      { language: "Persian | Farsi" },
-    ]);
-    
+
     // 获取选择需要翻译的语言
     const handleSelectionChange = (val) => {
-      // 遍历 val 数组中的每个子元素
       val.forEach((selectedObject) => {
-        // 获取语言属性的第一个值
-        const language = Reflect.get(selectedObject, 'language').split('|')[0].trim();
-        selectedRows.push(language)
+        const language = Reflect.get(selectedObject, "language")
+          .split("|")[0]
+          .trim();
+        selectedRows.push(language);
       });
-      // 数组去重
       selectedRows = Array.from(new Set(selectedRows));
+      if (selectedRows.length == translateOptions.length) {
+        selectAllTag.value += 1;
+        if (selectAllTag.value == 2) {
+          selectedRows = [];
+          selectAllTag.value = 0;
+        }
+      }
     };
-
     // 关闭弹框
     const closePopover = () => {
       nextTick(() => {
         if (popoverRef.value) {
           popoverRef.value.hide();
         }
-      }); 
-    }
-
+      });
+    };
     // Translate成文件按钮
     const handleTranslateToFile = () => {
-      console.log(props.originalContent);
-      context.emit('translate-to-files', props.originalContent); 
-      downloadFiles()
-      closePopover()
+      context.emit("translate-to-files", props.originalContent);
+      closePopover();
+      downloadFiles();
     };
 
     const handleLangChange = (e) => {
@@ -128,44 +96,32 @@ export default {
 
     const downloadFiles = async () => {
       try {
-        const compressedContent = JSON.stringify(JSON.parse(props.originalContent))
-        console.log(compressedContent);
-        const res = await exportLocalFiles({
+        const compressedContent = JSON.stringify(
+          JSON.parse(props.originalContent)
+        );
+        const res = await translateAndExportFiles({
           content: compressedContent,
           targetLang: selectedRows,
-          extraPrompt:"",
+          extraPrompt: "",
           config: {
             apiKey: config.apiKey,
             serviceProvider: "openai",
           },
-        });
+        }) 
         console.log(res);
-        const data = prettierJson(res)
-        console.log(data);
-        const file = await makeLocalesInZip(data,"json");
-        downloadFileFromBlob(file, "locales.zip");
       } catch (error) {
         console.log(error);
       } finally {
         show.value = false;
       }
-    }
-
-    const prettierJson = (content) => {
-      if (typeof content !== "string") return JSON.stringify(content, null, 2);
-      try {
-        return JSON.stringify(JSON.parse(content), null, 2);
-      } catch (error) {
-        throw new Error("json is not valid");
-      }
     };
 
     return {
-      options,
       popoverRef,
       singleTableRef,
       selectedLangs,
-      intlLanguages,
+      selectAllTag,
+      translateOptions,
       downloadFiles,
       handleLangChange,
       handleSelectionChange,
@@ -175,15 +131,7 @@ export default {
   },
 };
 </script>
-<style>
-.modal-popover {
-  height: 600px !important;
-  overflow-y: auto !important;
-  margin-top: 20px;
-}
-.el-table__header-wrapper .el-checkbox__inner {
-  display: none;
-}
+<style scoped lang="scss">
 .translate_files {
   width: 150px;
   height: 33px;
@@ -195,6 +143,12 @@ export default {
   background-color: rgb(20, 153, 242);
   border: 2px solid rgb(20, 153, 242);
 }
+.translate_files:hover {
+  background-color: #eaf6ff;
+  color: rgb(20, 153, 242);
+  border: 1px solid rgb(20, 153, 242);
+}
+
 .modal_button {
   width: 135px;
   height: 33px;

@@ -33,13 +33,13 @@ export const groupPairs = (pairs) => {
   };
 };
 
-export const createChatCompletion = async (props, config) => {
+export const createChatCompletion = async (props) => {
   let url =
     "https://ai-proxy.ksord.com/wps3.openai.azure.com/openai/deployments/gpt-35-turbo-version-0301/chat/completions?api-version=2023-03-15-preview";
   const headers = {
+    "Api-Key": "G4Q1R0jNruMDIzV0z32yEHaJxwDkNnnP",
     "Content-Type": "application/json; charset=utf-8",
   };
-  headers["Api-Key"] = `${config.apiKey}`;
   const response = await fetch(url, {
     method: "POST",
     headers,
@@ -59,22 +59,27 @@ export const createChatCompletion = async (props, config) => {
   }
   // 内部接口的返回数据的格式与openai不一样，需要进行调整转换
   const responseBody = await response.text();
+  console.log(responseBody);
   const lines = responseBody.split("\n");
-
+  console.log("lines",lines);
   const contents = lines.reduce((result, line) => {
+    console.log(line.startsWith("data:"));
     if (line.startsWith("data:")) {
       const jsonStr = line.substr("data:".length);
       try {
         const data = JSON.parse(jsonStr);
+        console.log(data);
         if (data.choices[0].delta.content) {
           result.push(data.choices[0].delta.content);
         }
       } catch (error) {
-        //
+        // 
       }
     }
     return result;
   }, []);
+  console.log(contents);
+  console.log(contents.join(""));
   return await contents.join("");
 };
 

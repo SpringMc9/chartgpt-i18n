@@ -8,7 +8,7 @@ import { buildJsonByPairs } from "../../api/utils/utils";
 
 export async function translateService(req) {
   const { config, content, targetLang, extraPrompt } = req;
-  console.log(targetLang);
+  console.log(content);
   const messages = [
     {
       role: "system",
@@ -38,6 +38,7 @@ export async function translateService(req) {
   const CHUNK_SIZE = 1000;
   let chunk = [];
   let chunkSize = 0;
+  console.log(requireTranslation);
   for (let i = 0; i < requireTranslation.length; i++) {
     chunk.push(requireTranslation[i][1]);
     chunkSize += requireTranslation[i][1].length;
@@ -93,6 +94,7 @@ export async function translateService(req) {
       return matchJSON(completion);
     })
     .then((raw) => {
+      console.log(raw);
       return JSON.parse(raw);
     })
     .then((r) => {
