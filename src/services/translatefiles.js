@@ -1,4 +1,4 @@
-import { BlobWriter, ZipWriter, TextReader } from "@zip.js/zip.js";
+
 import {
   compressValuesInJson,
   createChatCompletion,
@@ -11,8 +11,10 @@ import "ant-design-vue/dist/antd.css";
 
 export async function translateAndExportFiles(req) {
   const { content, targetLang, extraPrompt } = req;
+  console.log(targetLang);
   const translations = [];
   for (let i = 0; i < targetLang.length; i++) {
+    console.log(targetLang[i]);
     const messages = [
       {
         role: "system",
@@ -122,8 +124,7 @@ export async function translateAndExportFiles(req) {
     const data = prettierJson(result);
     translations.push(data);
   }
-  const zipBlob = await makeLocalesInZip(translations, targetLang);
-  downloadFileFromBlob(zipBlob, "locales.zip");
+  await makeLocalesInZip(translations, targetLang);
 }
 
 const prettierJson = (content) => {
@@ -136,18 +137,13 @@ const prettierJson = (content) => {
 };
 
 export async function makeLocalesInZip(translations, targetLang) {
-  const zipFileWriter = new BlobWriter();
-  const zipWriter = new ZipWriter(zipFileWriter);
   for (let i = 0; i < translations.length; i++) {
-    const translation = translations[i];
+    const data = translations[i];
     const lang = targetLang[i];
-    const contentReader = new TextReader(translation);
     const fileName = `locales_${lang}.json`;
-    await zipWriter.add(fileName, contentReader);
+    const blob = new Blob([data], { type: 'application/json' });
+    downloadFileFromBlob(blob, fileName)
   }
-
-  const blob = await zipWriter.close();
-  return blob;
 }
 
 export function downloadFileFromBlob(blob, fileName) {

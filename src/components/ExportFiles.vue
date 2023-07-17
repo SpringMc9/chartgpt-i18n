@@ -43,10 +43,10 @@ export default {
     extraPrompt: {
       type: String,
       required: false,
-    },
+    }
   },
   setup(props, context) {
-    const popoverRef = ref(null);
+    const popoverRef = ref(false);
     const selectAllTag = ref(0);
     const singleTableRef = ref(null);
     let selectedRows = [];
@@ -109,7 +109,7 @@ export default {
       downloadFiles,
       handleSelectionChange,
       handleTranslateToFile,
-      closePopover,
+      closePopover
     };
   },
 };

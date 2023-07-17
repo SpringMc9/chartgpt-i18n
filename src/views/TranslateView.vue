@@ -17,7 +17,11 @@
       >
         Translate
       </el-button>
-      <ExportFiles :originalContent="originalContent" :extraPrompt="extraPrompt" @translate-to-files="updateOriginalContent"/>
+      <ExportFiles
+        :originalContent="originalContent"
+        :extraPrompt="extraPrompt"
+        @translate-to-files="updateOriginalContent"
+      />
     </div>
     <div class="text-field">
       <TextField
@@ -81,6 +85,7 @@ export default {
     const editorTrans = ref(null);
     let editor_origin = null;
     let editor_trans = null;
+
 
     // 初始化编辑器
     const initializeEditor = () => {
@@ -171,7 +176,7 @@ export default {
       updateOriginalContent,
       requestTranslation,
       updateExtraPrompt,
-      copy2Clipboard,
+      copy2Clipboard
     };
   },
 };
@@ -180,8 +185,10 @@ export default {
 <style scoped lang="scss">
 .container {
   display: inline-block;
+
   .content-header {
     display: inline-block;
+
     .selectOption {
       width: 100px;
       height: 33px;
@@ -190,6 +197,7 @@ export default {
       border: none;
       outline: none;
     }
+
     .selectOption option:hover {
       background-color: aqua;
     }
@@ -205,12 +213,14 @@ export default {
       background-color: rgb(20, 153, 242);
       border: 2px solid rgb(20, 153, 242);
     }
+
     .translate-button:hover {
       background-color: #eaf6ff;
       color: rgb(20, 153, 242);
       border: 1px solid rgb(20, 153, 242);
     }
   }
+
   .text-field {
     margin-top: 10px;
     text-align: left;
@@ -229,6 +239,7 @@ export default {
       font-weight: 600;
       margin: 5px 0;
     }
+
     .original-locale {
       width: 606px;
       height: 696px;
@@ -253,6 +264,7 @@ export default {
         float: right;
         margin-right: 3px;
       }
+
       .translated {
         display: inline-block;
         text-align: left;
