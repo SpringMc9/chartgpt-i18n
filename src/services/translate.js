@@ -57,7 +57,9 @@ export async function translateService(req) {
         ],
       })
         .then((completion) => {
-          console.log(completion);
+          if (completion === "这是GPT的回答") {
+            return "[]";
+          }
           return matchJSON(completion);
         })
         .then((raw) => {
@@ -90,6 +92,9 @@ export async function translateService(req) {
     ],
   })
     .then((completion) => {
+      if (completion === "这是GPT的回答") {
+        return "[]";
+      }
       return matchJSON(completion);
     })
     .then((raw) => {

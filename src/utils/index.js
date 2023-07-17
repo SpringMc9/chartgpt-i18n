@@ -34,6 +34,7 @@ export const groupPairs = (pairs) => {
 };
 
 export const createChatCompletion = async (props) => {
+  const regex = /^[A-Za-z,. ]+$/;
   let url =
     "https://ai-proxy.ksord.com/wps3.openai.azure.com/openai/deployments/gpt-35-turbo-version-0301/chat/completions?api-version=2023-03-15-preview";
   const headers = {
@@ -60,37 +61,44 @@ export const createChatCompletion = async (props) => {
   // 内部接口的返回数据的格式与openai不一样，需要进行调整转换
   const responseBody = await response.text();
   const lines = responseBody.split("\n");
-
-  let contents = lines.reduce((result, line) => {
-    if (line.startsWith("data:")) {
-      const jsonStr = line.substr("data:".length);
-      try {
-        const data = JSON.parse(jsonStr);
-        if (data.choices[0].delta.content) {
-          result.push(data.choices[0].delta.content);
+  if (
+    !regex.test(
+      JSON.parse(lines[2].substr("data:".length)).choices[0].delta.content
+    )
+  ) {
+    let contents = lines.reduce((result, line) => {
+      if (line.startsWith("data:")) {
+        const jsonStr = line.substr("data:".length);
+        try {
+          const data = JSON.parse(jsonStr);
+          if (data.choices[0].delta.content) {
+            result.push(data.choices[0].delta.content);
+          }
+        } catch (error) {
+          //
         }
-      } catch (error) {
-        //
+      }
+      return result;
+    }, []);
+    // 检查最后一条json是不是被完整翻译
+    if (!contents[contents.length - 1].includes("]]")) {
+      let index = contents.lastIndexOf('"],["');
+      const index1 = contents.lastIndexOf('["');
+      index = index > index1 ? index : index1;
+      if (index !== -1) {
+        if (contents[index] === '"],["') {
+          contents = contents.slice(0, index);
+          contents.push('"]]');
+        } else if (contents[index] === '["') {
+          contents = contents.slice(0, index - 1);
+          contents.push("]]");
+        }
       }
     }
-    return result;
-  }, []);
-  // 检查最后一条json是不是被完整翻译
-  if (contents[contents.length - 1] !== '"]]') {
-    let index = contents.lastIndexOf('"],["');
-    const index1 = contents.lastIndexOf('["');
-    index = index > index1 ? index : index1;
-    if (index !== -1) {
-      if (contents[index] === '"],["') {
-        contents = contents.slice(0, index);
-        contents.push('"]]');
-      } else if (contents[index] === '["') {
-        contents = contents.slice(0, index - 1);
-        contents.push('"]]');
-      }
-    }
+    return await contents.join("");
+  } else {
+    return await "这是GPT的回答";
   }
-  return await contents.join("");
 };
 
 export const matchJSON = (str) => {

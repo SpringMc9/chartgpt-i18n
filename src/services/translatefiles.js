@@ -65,6 +65,9 @@ export async function translateAndExportFiles(req) {
           ],
         })
           .then((completion) => {
+            if (completion === "这是GPT的回答") {
+              return "[]";
+            }
             return matchJSON(completion);
           })
           .then((raw) => {
@@ -98,6 +101,9 @@ export async function translateAndExportFiles(req) {
       ],
     })
       .then((completion) => {
+        if (completion === "这是GPT的回答") {
+          return "[]";
+        }
         return matchJSON(completion);
       })
       .then((raw) => {
