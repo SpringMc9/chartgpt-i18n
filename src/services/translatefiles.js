@@ -1,4 +1,3 @@
-
 import {
   compressValuesInJson,
   createChatCompletion,
@@ -11,7 +10,6 @@ import "ant-design-vue/dist/antd.css";
 
 export async function translateAndExportFiles(req) {
   const { content, targetLang, extraPrompt } = req;
-  console.log(targetLang);
   const translations = [];
   for (let i = 0; i < targetLang.length; i++) {
     console.log(targetLang[i]);
@@ -21,7 +19,7 @@ export async function translateAndExportFiles(req) {
         // content: `You are a helpful assistant that translates a i18n locale array content to ${targetLang}.
         //       It's a array structure, contains many strings, translate each of them and make a new array of translated strings.
         //       Consider all the string as a context to make better translation.\n`,
-        content: `You are a helpful assistant that translates a i18n locale key-value objects to ${targetLang}.
+        content: `You are a helpful assistant that translates a i18n locale key-value objects to ${targetLang[i]}.
             It's a key-value objects, contains many key-value values, translate each of them and make a new array of translated strings.
             Consider all the string as a context to make better translation.\n`,
       },
@@ -73,7 +71,7 @@ export async function translateAndExportFiles(req) {
             return matchJSON(completion);
           })
           .then((raw) => {
-            JSON.parse(raw);
+            return JSON.parse(raw);
           })
           .then((r) => {
             if (r.length !== freezeChunk.length) {
@@ -113,14 +111,14 @@ export async function translateAndExportFiles(req) {
       })
       .then((r) => {
         if (r.length !== freezeChunk.length) {
-          // message.error("返回数据数量不正确，请重新翻译")
+          message.error("返回数据数量不正确");
           console.log("diff ", r.length, freezeChunk.length);
         }
         return r;
       })
       .catch((err) => {
         console.log(err);
-        // message.error("翻译失败，请重新翻译
+        // message.error("翻译失败，请重新翻译")
         return freezeChunk;
       });
     tasks.push(ft);
@@ -147,8 +145,8 @@ export async function makeLocalesInZip(translations, targetLang) {
     const data = translations[i];
     const lang = targetLang[i];
     const fileName = `locales_${lang}.json`;
-    const blob = new Blob([data], { type: 'application/json' });
-    downloadFileFromBlob(blob, fileName)
+    const blob = new Blob([data], { type: "application/json" });
+    downloadFileFromBlob(blob, fileName);
   }
 }
 

@@ -80,18 +80,32 @@ export const createChatCompletion = async (props) => {
       }
       return result;
     }, []);
+    console.log(contents);
     // 检查最后一条json是不是被完整翻译
-    if (!contents[contents.length - 1].includes("]]")) {
+    if (contents[contents.length - 1] === '"],\n') {
+      contents = contents.slice(0, contents.length - 1);
+      contents.push('"]]');
+    } else if (!contents[contents.length - 1].includes("]]")) {
       let index = contents.lastIndexOf('"],["');
       const index1 = contents.lastIndexOf('["');
+      const index2 = contents.lastIndexOf(' ["');
       index = index > index1 ? index : index1;
+      index = index > index2 ? index : index2;
       if (index !== -1) {
         if (contents[index] === '"],["') {
           contents = contents.slice(0, index);
           contents.push('"]]');
-        } else if (contents[index] === '["') {
-          contents = contents.slice(0, index - 1);
-          contents.push("]]");
+        } else {
+          if (contents[index - 1] === " " || contents[index - 1] === "\n") {
+            contents = contents.slice(0, index - 2);
+            contents.push('"]]');
+          } else if (contents[index - 1].includes('"')) {
+            contents = contents.slice(0, index - 1);
+            contents.push('"]]');
+          } else {
+            contents = contents.slice(0, index - 1);
+            contents.push("]]");
+          }
         }
       }
     }
