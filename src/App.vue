@@ -24,14 +24,4 @@ nav {
     font-size: 30px;
   }
 }
-.el-popover {
-  height: 600px;
-  overflow-y: auto;
-  margin-top: 20px;
-}
-.select option:hover {
-  /* 修改鼠标停留在 option 元素时的样式 */
-  background-color: #dc1e1e;
-  cursor: pointer;
-}
 </style>
