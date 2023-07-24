@@ -16,9 +16,6 @@ export async function translateAndExportFiles(req) {
     const messages = [
       {
         role: "system",
-        // content: `You are a helpful assistant that translates a i18n locale array content to ${targetLang}.
-        //       It's a array structure, contains many strings, translate each of them and make a new array of translated strings.
-        //       Consider all the string as a context to make better translation.\n`,
         content: `You are a helpful assistant that translates a i18n locale key-value objects to ${targetLang[i]}.
             It's a key-value objects, contains many key-value values, translate each of them and make a new array of translated strings.
             Consider all the string as a context to make better translation.\n`,
@@ -27,15 +24,12 @@ export async function translateAndExportFiles(req) {
     if (typeof extraPrompt === "string" && extraPrompt.length > 0) {
       messages.push({
         role: "user",
-        // content: `Other tips for translation: ${extraPrompt}\n
-        //       Translate this array: \n\n\n`,
         content: `Other tips for translation: ${extraPrompt}\n  
             Translate this key-value object: \n\n\n`,
       });
     } else {
       messages.push({
         role: "user",
-        // content: `Translate this array: \n\n\n`,
         content: `Translate this key-value object: \n\n\n`,
       });
     }
@@ -49,7 +43,6 @@ export async function translateAndExportFiles(req) {
     let chunk = [];
     let chunkSize = 0;
     for (let i = 0; i < requireTranslation.length; i++) {
-      // chunk.push(requireTranslation[i][1]);
       chunk.push(requireTranslation[i]);
       chunkSize +=
         requireTranslation[i][1].length + requireTranslation[i][0].length;
@@ -128,6 +121,7 @@ export async function translateAndExportFiles(req) {
     const translated = (await Promise.all(tasks)).flatMap((t) => t);
     const nextPairs = translated.concat(noTranslation);
     const result = buildJsonByPairs(nextPairs);
+    console.log(result);
     const data = prettierJson(result);
     translations.push(data);
   }

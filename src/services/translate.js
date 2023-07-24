@@ -125,5 +125,6 @@ export async function translateService(req) {
   //   .concat(noTranslation);
   const nextPairs = translated.concat(noTranslation);
   const result = buildJsonByPairs(nextPairs);
+  console.log(result);
   return result;
 }

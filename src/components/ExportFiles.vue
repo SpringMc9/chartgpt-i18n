@@ -72,6 +72,7 @@ export default {
     const closePopover = () => {
       nextTick(() => {
         if (popoverRef.value) {
+          singleTableRef.value.clearSelection()
           popoverRef.value.hide();
         }
       });
@@ -79,7 +80,6 @@ export default {
     // Translate成文件按钮
     const handleTranslateToFile = () => {
       context.emit("translate-to-files", props.originalContent);
-      closePopover();
       downloadFiles();
     };
 
@@ -114,7 +114,12 @@ export default {
   },
 };
 </script>
-<style scoped lang="scss">
+<style lang="scss">
+.modal-popover {
+  height: 600px;
+  overflow-y: auto;
+  margin-top: 5%;
+}
 .translate_files {
   width: 150px;
   height: 33px;
