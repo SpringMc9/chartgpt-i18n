@@ -45,15 +45,16 @@ export async function translateAndExportFiles(req) {
     compressValuesInJson(locale, "", pairs);
     const { requireTranslation, noTranslation } = groupPairs(pairs);
     const tasks = [];
-    const CHUNK_SIZE = 60;
+    const CHUNK_SIZE = 1000;
     let chunk = [];
-    // let chunkSize = 0;
+    let chunkSize = 0;
     for (let i = 0; i < requireTranslation.length; i++) {
       // chunk.push(requireTranslation[i][1]);
       chunk.push(requireTranslation[i]);
-      // chunkSize += requireTranslation[i][1].length;
-      // if (chunkSize >= CHUNK_SIZE) {
-      if (chunk.length >= CHUNK_SIZE) {
+      chunkSize +=
+        requireTranslation[i][1].length + requireTranslation[i][0].length;
+      if (chunkSize >= CHUNK_SIZE) {
+        // if (chunk.length >= CHUNK_SIZE) {
         const freezeChunk = [...chunk];
         const finishedTask = await createChatCompletion({
           messages: [
@@ -86,7 +87,7 @@ export async function translateAndExportFiles(req) {
             return freezeChunk;
           });
         chunk = [];
-        // chunkSize = 0;
+        chunkSize = 0;
         tasks.push(finishedTask);
       }
     }
@@ -122,6 +123,8 @@ export async function translateAndExportFiles(req) {
         return freezeChunk;
       });
     tasks.push(ft);
+    chunk = [];
+    chunkSize = 0;
     const translated = (await Promise.all(tasks)).flatMap((t) => t);
     const nextPairs = translated.concat(noTranslation);
     const result = buildJsonByPairs(nextPairs);

@@ -46,11 +46,11 @@ export const createChatCompletion = async (props) => {
     headers,
     body: JSON.stringify({
       model: "gpt-35-turbo-version-0301",
-      frequency_penalty: 0,
-      max_tokens: 1000,
-      presence_penalty: 0,
+      frequency_penalty: 0, // -2.0~2.0 值越高表达用词越罕见
+      max_tokens: 2048, // 生成回应时允许的最大标记数
+      presence_penalty: 0, // -2.0~2.0 值越高与上下文关联度越大
       stream: true,
-      temperature: 0.7,
+      temperature: 0, // 0~2 值越高结果越随机多样
       top_p: 1,
       messages: props.messages,
     }),
@@ -58,7 +58,7 @@ export const createChatCompletion = async (props) => {
   if (response.status !== 200) {
     throw new Error("failed to create chat completion");
   }
-  // 内部接口的返回数据的格式与openai不一样，需要进行调整转换
+  // 内部接口的返回数据的格式与openai不一样，需要进行调整转换（流式传输）
   const responseBody = await response.text();
   const lines = responseBody.split("\n");
   if (
@@ -80,7 +80,6 @@ export const createChatCompletion = async (props) => {
       }
       return result;
     }, []);
-    console.log(contents);
     // 检查最后一条json是不是被完整翻译
     if (contents[contents.length - 1] === '"],\n') {
       contents = contents.slice(0, contents.length - 1);

@@ -40,12 +40,15 @@ export async function translateService(req) {
   compressValuesInJson(locale, "", pairs);
   const { requireTranslation, noTranslation } = groupPairs(pairs);
   const tasks = [];
-  const CHUNK_SIZE = 60; // 一次翻译的最大长度
+  const CHUNK_SIZE = 1000;
   let chunk = [];
+  let chunkSize = 0;
   for (let i = 0; i < requireTranslation.length; i++) {
+    chunkSize +=
+      requireTranslation[i][0].length + requireTranslation[i][1].length;
     // chunk.push(requireTranslation[i][1]);
     chunk.push(requireTranslation[i]);
-    if (chunk.length >= CHUNK_SIZE) {
+    if (chunkSize >= CHUNK_SIZE) {
       const freezeChunk = [...chunk];
       const finishedTask = await createChatCompletion({
         messages: [
@@ -78,6 +81,7 @@ export async function translateService(req) {
           return freezeChunk;
         });
       chunk = [];
+      chunkSize = 0;
       tasks.push(finishedTask);
     }
   }
@@ -113,6 +117,8 @@ export async function translateService(req) {
       return freezeChunk;
     });
   tasks.push(ft);
+  chunk = [];
+  chunkSize = 0;
   const translated = (await Promise.all(tasks)).flatMap((t) => t);
   // const nextPairs = translated
   //   .map((t, i) => [requireTranslation[i][0], t])
