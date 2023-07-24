@@ -21,10 +21,10 @@
       <el-table-column property="language" label="Language" width="300" />
       <el-table-column type="selection" width="55" ref="selectAll" />
     </el-table>
-    <button class="modal_button" @click="closePopover()">Close</button>
-    <button class="modal_button" @click="handleTranslateToFile()">
+    <el-button class="modal_button" @click="closePopover()">Close</el-button>
+    <el-button class="modal_button" @click="handleTranslateToFile()">
       Translate
-    </button>
+    </el-button>
   </el-popover>
 </template>
 
@@ -115,38 +115,41 @@ export default {
 };
 </script>
 <style lang="scss">
-.modal-popover {
+ .modal-popover {
   height: 600px;
   overflow-y: auto;
   margin-top: 5%;
 }
+
 .translate_files {
   width: 150px;
-  height: 33px;
-  margin-left: 20px;
-  border-radius: 7px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  background-color: rgb(20, 153, 242);
-  border: 2px solid rgb(20, 153, 242);
+  height: 33px !important;
+  margin-left: 20px !important;
+  border-radius: 7px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  background-color: rgb(20, 153, 242) !important;
+  border: 2px solid rgb(20, 153, 242) !important;
 }
+
 .translate_files:hover {
-  background-color: #eaf6ff;
-  color: rgb(20, 153, 242);
-  border: 1px solid rgb(20, 153, 242);
+  background-color: #eaf6ff !important;
+  color: rgb(20, 153, 242) !important;
+  border: 1px solid rgb(20, 153, 242) !important;
 }
+
 
 .modal_button {
   width: 135px;
-  height: 33px;
-  margin-top: 13px;
-  margin-left: 31px;
-  border-radius: 7px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  background-color: rgb(20, 153, 242);
-  border: 2px solid rgb(20, 153, 242);
+  height: 33px !important;
+  margin-top: 13px !important;
+  margin-left: 31px !important;
+  border-radius: 7px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  background-color: rgb(20, 153, 242) !important;
+  border: 2px solid rgb(20, 153, 242) !important; 
 }
 </style>
