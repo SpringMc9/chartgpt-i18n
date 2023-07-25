@@ -22,6 +22,7 @@
         :extraPrompt="extraPrompt"
         @translate-to-files="updateOriginalContent"
       />
+      <ParameterSet />
     </div>
     <div class="text-field">
       <TextField
@@ -67,6 +68,7 @@ import { ref, onMounted } from "vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import TextField from "../components/TextField";
 import ExportFiles from "../components/ExportFiles";
+import ParameterSet from '../components/ParameterSet.vue'
 import { translateService } from "../services/translate";
 import { intlLanguages } from "../type/type";
 import { DocumentDuplicateIcon, FolderOpenIcon } from "@heroicons/vue/outline";
@@ -80,6 +82,7 @@ export default {
     ExportFiles,
     DocumentDuplicateIcon,
     FolderOpenIcon,
+    ParameterSet,
   },
   setup() {
     const originalContent = ref("");
@@ -219,7 +222,8 @@ export default {
   display: inline-block;
 
   .content-header {
-    display: inline-block;
+    display: flex;
+    justify-content: center;
 
     .selectOption {
       width: 100px;

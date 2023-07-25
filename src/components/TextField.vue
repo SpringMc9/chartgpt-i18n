@@ -57,6 +57,7 @@ export default {
     border: none;
     outline: none;
     margin-top: 6px;
+    padding-left: 2ch;
   }
 }
 </style>
