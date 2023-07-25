@@ -121,7 +121,6 @@ export async function translateAndExportFiles(req) {
     const translated = (await Promise.all(tasks)).flatMap((t) => t);
     const nextPairs = translated.concat(noTranslation);
     const result = buildJsonByPairs(nextPairs);
-    console.log(result);
     const data = prettierJson(result);
     translations.push(data);
   }

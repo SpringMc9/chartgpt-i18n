@@ -80,6 +80,7 @@ export default {
     // Translate成文件按钮
     const handleTranslateToFile = () => {
       context.emit("translate-to-files", props.originalContent);
+      closePopover();
       downloadFiles();
     };
 
@@ -96,8 +97,6 @@ export default {
         console.log(res);
       } catch (error) {
         console.log(error);
-      } finally {
-        closePopover();
       }
     };
 

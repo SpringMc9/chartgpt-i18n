@@ -33,7 +33,12 @@
     </div>
     <div class="translate-content">
       <div class="original-locale">
-        <div class="text">Original locale</div>
+        <div class="text">
+          Original locale
+          <div title="导入文件内容" class="file">
+            <FolderOpenIcon @click="importFile" />
+          </div>
+        </div>
         <div
           class="original"
           ref="editorOrigin"
@@ -43,10 +48,9 @@
       <div class="translated-locale">
         <div class="text">
           Translated locale
-          <DocumentDuplicateIcon
-            @click="copy2Clipboard(transContent)"
-            class="copy"
-          />
+          <div title="复制" class="copy">
+            <DocumentDuplicateIcon @click="copy2Clipboard(transContent)" />
+          </div>
         </div>
         <div
           class="translated"
@@ -65,7 +69,7 @@ import TextField from "../components/TextField";
 import ExportFiles from "../components/ExportFiles";
 import { translateService } from "../services/translate";
 import { intlLanguages } from "../type/type";
-import { DocumentDuplicateIcon } from "@heroicons/vue/outline";
+import { DocumentDuplicateIcon, FolderOpenIcon } from "@heroicons/vue/outline";
 import { message } from "ant-design-vue";
 import "ant-design-vue/dist/antd.css";
 
@@ -75,6 +79,7 @@ export default {
     TextField,
     ExportFiles,
     DocumentDuplicateIcon,
+    FolderOpenIcon,
   },
   setup() {
     const originalContent = ref("");
@@ -85,7 +90,7 @@ export default {
     const editorTrans = ref(null);
     let editor_origin = null;
     let editor_trans = null;
-
+    const fileSelected = ref(false);
 
     // 初始化编辑器
     const initializeEditor = () => {
@@ -146,6 +151,31 @@ export default {
         });
     };
 
+    // 导入文件
+    const importFile = () => {
+      fileSelected.value = false;
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.style.display = "none";
+      fileInput.addEventListener("change", handleFileChange);
+      document.body.appendChild(fileInput);
+      fileInput.click();
+      document.body.removeChild(fileInput);
+    };
+
+    const handleFileChange = (event) => {
+      const selectedFile = event.target.files[0];
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const content = event.target.result;
+          editor_origin.setValue(content);
+        };
+        reader.readAsText(selectedFile);
+        fileSelected.value = true;
+      }
+    };
+
     const compress = (content) => {
       try {
         return JSON.stringify(JSON.parse(content.value));
@@ -176,7 +206,9 @@ export default {
       updateOriginalContent,
       requestTranslation,
       updateExtraPrompt,
-      copy2Clipboard
+      copy2Clipboard,
+      importFile,
+      handleFileChange,
     };
   },
 };
@@ -246,6 +278,11 @@ export default {
       border-radius: 7px;
       border: 2px solid black;
 
+      .file {
+        width: 1.35rem;
+        float: right;
+        margin-right: 4px;
+      }
       .original {
         display: inline-block;
         text-align: left;
@@ -262,7 +299,7 @@ export default {
       .copy {
         width: 1.35rem;
         float: right;
-        margin-right: 3px;
+        margin-right: 4px;
       }
 
       .translated {
