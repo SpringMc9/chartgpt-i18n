@@ -22,7 +22,7 @@
         />
       </div>
       <div class="parm">
-        <span>max_tokens: &nbsp; <input type="text" class="textInput" /></span>
+        <span>max_tokens: &nbsp; <input type="text" class="textInput" ref="maxTokens" value="1000" /></span>
       </div>
       <div class="parm">
         <span>presence_penalty(-2.0~2.0): {{ presencePenalty }}</span>
@@ -62,6 +62,7 @@ export default {
   props: {},
   setup() {
     const temperature = ref(0.0);
+    const maxTokens = ref(1000)
     const presencePenalty = ref(-2.0);
     const frequencyPenalty = ref(-2.0);
 
@@ -80,7 +81,8 @@ export default {
     return {
       temperature,
       presencePenalty,
-      frequencyPenalty
+      frequencyPenalty,
+      maxTokens
     };
   },
 };

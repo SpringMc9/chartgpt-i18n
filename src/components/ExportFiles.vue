@@ -35,6 +35,9 @@ import { translateOptions } from "../type/type";
 
 export default {
   name: "ExportFiles",
+  components: {
+    // ParameterSet
+  },
   props: {
     originalContent: {
       type: String,
@@ -42,6 +45,10 @@ export default {
     },
     extraPrompt: {
       type: String,
+      required: false,
+    },
+    temperature: {
+      type: Number,
       required: false,
     }
   },
@@ -84,6 +91,10 @@ export default {
     };
 
     const downloadFiles = async () => {
+      const setParameters = {
+        temperature: props.temperature
+      }
+      console.log(setParameters);
       try {
         const compressedContent = JSON.stringify(
           JSON.parse(props.originalContent)
