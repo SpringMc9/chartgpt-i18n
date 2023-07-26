@@ -95,6 +95,10 @@ export default {
     };
 
     const downloadFiles = async () => {
+      const setParameters = {
+        temperature: props.temperature
+      }
+      console.log(setParameters);
       try {
         const compressedContent = JSON.stringify(
           JSON.parse(props.originalContent)
