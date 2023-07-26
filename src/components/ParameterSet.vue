@@ -126,6 +126,7 @@ export default {
 .settingIcon {
   width: 2%;
   outline: none;
+  cursor: pointer;
 }
 .setParm {
   .parm {

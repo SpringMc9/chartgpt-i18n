@@ -39,7 +39,7 @@
         <div class="text">
           Original locale
           <div title="导入文件内容" class="file">
-            <FolderOpenIcon @click="importFile" />
+            <FolderOpenIcon @click="importFile" class="importFile" />
           </div>
         </div>
         <div
@@ -52,7 +52,7 @@
         <div class="text">
           Translated locale
           <div title="复制" class="copy">
-            <DocumentDuplicateIcon @click="copy2Clipboard(transContent)" />
+            <DocumentDuplicateIcon @click="copy2Clipboard(transContent)" class="textCopy" />
           </div>
         </div>
         <div
@@ -306,6 +306,9 @@ export default {
         width: 1.35rem;
         float: right;
         margin-right: 4px;
+        .importFile {
+          cursor: pointer;
+        }
       }
       .original {
         display: inline-block;
@@ -324,6 +327,9 @@ export default {
         width: 1.35rem;
         float: right;
         margin-right: 4px;
+        .textCopy {
+          cursor: pointer;
+        }
       }
 
       .translated {
