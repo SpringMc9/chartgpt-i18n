@@ -7,7 +7,11 @@
     ref="popoverRef"
   >
     <template #reference>
-      <el-button class="translate_files" style="margin-right: 16px">
+      <el-button
+        class="translate_files"
+        :loading="isLoading"
+        style="margin-right: 16px"
+      >
         Translate to files
       </el-button>
     </template>
@@ -43,12 +47,17 @@ export default {
     extraPrompt: {
       type: String,
       required: false,
-    }
+    },
+    parameterChanged: {
+      type: Object,
+      required: true,
+    },
   },
   setup(props, context) {
     const popoverRef = ref(false);
     const selectAllTag = ref(0);
     const singleTableRef = ref(null);
+    const isLoading = ref(false);
     let selectedRows = [];
 
     // 获取选择需要翻译的语言
@@ -72,7 +81,7 @@ export default {
     const closePopover = () => {
       nextTick(() => {
         if (popoverRef.value) {
-          singleTableRef.value.clearSelection()
+          singleTableRef.value.clearSelection();
           popoverRef.value.hide();
         }
       });
@@ -81,6 +90,7 @@ export default {
     const handleTranslateToFile = () => {
       context.emit("translate-to-files", props.originalContent);
       closePopover();
+      isLoading.value = true;
       downloadFiles();
     };
 
@@ -93,10 +103,14 @@ export default {
           content: compressedContent,
           targetLang: selectedRows,
           extraPrompt: props.extraPrompt,
-        }) 
+          parameterChanged: props.parameterChanged,
+        });
         console.log(res);
       } catch (error) {
         console.log(error);
+      } finally {
+        selectedRows = [];
+        isLoading.value = false;
       }
     };
 
@@ -105,23 +119,24 @@ export default {
       singleTableRef,
       selectAllTag,
       translateOptions,
+      isLoading,
       downloadFiles,
       handleSelectionChange,
       handleTranslateToFile,
-      closePopover
+      closePopover,
     };
   },
 };
 </script>
 <style lang="scss">
- .modal-popover {
+.modal-popover {
   height: 600px;
   overflow-y: auto;
   margin-top: 5%;
 }
 
 .translate_files {
-  width: 150px;
+  width: 165px;
   height: 33px !important;
   margin-left: 20px !important;
   border-radius: 7px !important;
@@ -138,7 +153,6 @@ export default {
   border: 1px solid rgb(20, 153, 242) !important;
 }
 
-
 .modal_button {
   width: 135px;
   height: 33px !important;
@@ -149,6 +163,6 @@ export default {
   font-weight: 600 !important;
   color: #fff !important;
   background-color: rgb(20, 153, 242) !important;
-  border: 2px solid rgb(20, 153, 242) !important; 
+  border: 2px solid rgb(20, 153, 242) !important;
 }
 </style>

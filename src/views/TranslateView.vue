@@ -12,6 +12,7 @@
       </select>
       <el-button
         type="button"
+        :loading="isLoading"
         class="translate-button"
         @click="requestTranslation"
       >
@@ -20,9 +21,10 @@
       <ExportFiles
         :originalContent="originalContent"
         :extraPrompt="extraPrompt"
+        :parameterChanged="parameterChanged"
         @translate-to-files="updateOriginalContent"
       />
-      <ParameterSet />
+      <ParameterSet @updateParameter="handleParameter" />
     </div>
     <div class="text-field">
       <TextField
@@ -68,7 +70,7 @@ import { ref, onMounted } from "vue";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import TextField from "../components/TextField";
 import ExportFiles from "../components/ExportFiles";
-import ParameterSet from '../components/ParameterSet.vue'
+import ParameterSet from "../components/ParameterSet.vue";
 import { translateService } from "../services/translate";
 import { intlLanguages } from "../type/type";
 import { DocumentDuplicateIcon, FolderOpenIcon } from "@heroicons/vue/outline";
@@ -94,6 +96,13 @@ export default {
     let editor_origin = null;
     let editor_trans = null;
     const fileSelected = ref(false);
+    const isLoading = ref(false);
+    const parameterChanged = ref({
+      temperature: 0,
+      presencePenalty: 0,
+      frequencyPenalty: 0,
+      tokensValue: 2048,
+    });
 
     // 初始化编辑器
     const initializeEditor = () => {
@@ -121,20 +130,28 @@ export default {
       originalContent.value = editor_origin.getValue();
     };
 
+    const handleParameter = (val) => {
+      parameterChanged.value = val;
+    };
+
     // 翻译请求
     const requestTranslation = async () => {
       try {
+        isLoading.value = true;
         const compressedContent = compress(originalContent);
         const data = await translateService({
           content: compressedContent,
           targetLang: lang.value,
           extraPrompt: extraPrompt.value,
+          parameterChanged: parameterChanged.value,
         });
         transContent.value = prettierJson(data);
         editor_trans.setValue(transContent.value);
       } catch (error) {
         console.log(error);
         console.log("translate service error!!");
+      } finally {
+        isLoading.value = false;
       }
     };
 
@@ -183,7 +200,7 @@ export default {
       try {
         return JSON.stringify(JSON.parse(content.value));
       } catch (error) {
-        // message.error("不是正确的json格式，请重新输入")
+        message.error("请输入正确的json数据");
         throw new Error("json is not valid");
       }
     };
@@ -206,12 +223,15 @@ export default {
       intlLanguages,
       editor_origin,
       editor_trans,
+      isLoading,
+      parameterChanged,
       updateOriginalContent,
       requestTranslation,
       updateExtraPrompt,
       copy2Clipboard,
       importFile,
       handleFileChange,
+      handleParameter,
     };
   },
 };
@@ -239,7 +259,7 @@ export default {
     }
 
     .translate-button {
-      width: 90px;
+      width: 113px;
       height: 33px;
       margin-left: 20px;
       border-radius: 7px;

@@ -5,9 +5,11 @@ import {
   matchJSON,
 } from "../utils";
 import { buildJsonByPairs } from "../../api/utils/utils";
+import { message } from "ant-design-vue";
+import "ant-design-vue/dist/antd.css";
 
 export async function translateService(req) {
-  const { content, targetLang, extraPrompt } = req;
+  const { content, targetLang, extraPrompt, parameterChanged } = req;
   const messages = [
     {
       role: "system",
@@ -58,6 +60,7 @@ export async function translateService(req) {
             content: JSON.stringify(freezeChunk),
           },
         ],
+        parameterChanged,
       })
         .then((completion) => {
           if (completion === "这是GPT的回答") {
@@ -70,14 +73,13 @@ export async function translateService(req) {
         })
         .then((r) => {
           if (r.length !== freezeChunk.length) {
-            // message.error("返回数据数量不正确，请重新翻译")
             console.log("diff ", r.length, freezeChunk.length);
           }
           return r;
         })
         .catch((err) => {
           console.log(err);
-          // message.error("翻译失败，请重新翻译")
+          message.error(`部分数据翻译失败`);
           return freezeChunk;
         });
       chunk = [];
@@ -94,6 +96,7 @@ export async function translateService(req) {
         content: JSON.stringify(freezeChunk),
       },
     ],
+    parameterChanged,
   })
     .then((completion) => {
       if (completion === "这是GPT的回答") {
@@ -106,19 +109,23 @@ export async function translateService(req) {
     })
     .then((r) => {
       if (r.length !== freezeChunk.length) {
-        // message.error("返回数据数量不正确，请重新翻译")
         console.log("diff ", r.length, freezeChunk.length);
       }
       return r;
     })
     .catch((err) => {
       console.log(err);
-      // message.error("翻译失败，请重新翻译")
+      message.error("部分数据翻译失败");
       return freezeChunk;
     });
   tasks.push(ft);
   chunk = [];
   chunkSize = 0;
+  if (tasks[0].length !== requireTranslation.length) {
+    message.error(
+      `返回数据数量不正确,少了${requireTranslation.length - tasks.length}条`
+    );
+  }
   const translated = (await Promise.all(tasks)).flatMap((t) => t);
   // const nextPairs = translated
   //   .map((t, i) => [requireTranslation[i][0], t])

@@ -22,7 +22,10 @@
         />
       </div>
       <div class="parm">
-        <span>max_tokens: &nbsp; <input type="text" class="textInput" /></span>
+        <span
+          >max_tokens: &nbsp;
+          <input type="text" class="textInput" v-model="tokensValue" @input="handleInputChange"
+        /></span>
       </div>
       <div class="parm">
         <span>presence_penalty(-2.0~2.0): {{ presencePenalty }}</span>
@@ -60,27 +63,57 @@ export default {
     Setting,
   },
   props: {},
-  setup() {
+  setup(_, { emit }) {
     const temperature = ref(0.0);
-    const presencePenalty = ref(-2.0);
-    const frequencyPenalty = ref(-2.0);
+    const presencePenalty = ref(0.0);
+    const frequencyPenalty = ref(0.0);
+    const tokensValue = ref(2048);
+    const parameterChanged = ref({
+      temperature: temperature.value,
+      presencePenalty: presencePenalty.value,
+      frequencyPenalty: frequencyPenalty.value,
+      tokensValue:tokensValue.value
+    });
+
+    const handleInputChange = () => {
+      parameterChanged.value = { ...parameterChanged.value, tokensValue: tokensValue.value }
+      emit("updateParameter", parameterChanged.value);
+    }
 
     watch(temperature, (newValue) => {
-      document.documentElement.style.setProperty('--temperature_value', newValue);
+      document.documentElement.style.setProperty(
+        "--temperature_value",
+        newValue
+      );
+      parameterChanged.value = { ...parameterChanged.value, temperature: newValue }
+      emit("updateParameter", parameterChanged.value);
     });
 
     watch(presencePenalty, (newValue) => {
-      document.documentElement.style.setProperty('--presencePenalty_value', newValue);
+      document.documentElement.style.setProperty(
+        "--presencePenalty_value",
+        newValue
+      );
+      parameterChanged.value = { ...parameterChanged.value, presencePenalty: newValue }
+      emit("updateParameter", parameterChanged.value);
     });
 
     watch(frequencyPenalty, (newValue) => {
-      document.documentElement.style.setProperty('--frequencyPenalty_value', newValue);
+      document.documentElement.style.setProperty(
+        "--frequencyPenalty_value",
+        newValue
+      );
+      parameterChanged.value = { ...parameterChanged.value, frequencyPenalty: newValue }
+      emit("updateParameter", parameterChanged.value);
     });
 
     return {
       temperature,
       presencePenalty,
-      frequencyPenalty
+      frequencyPenalty,
+      tokensValue,
+      parameterChanged,
+      handleInputChange,
     };
   },
 };
@@ -120,30 +153,34 @@ export default {
 
     .first {
       background: linear-gradient(
-        to right, 
-        rgb(20, 153, 242) 0%, 
-        rgb(20, 153, 242) calc((var(--temperature_value) - 0) / (2.0 - .0) * 100%), 
-        rgb(202, 199, 199) calc((var(--temperature_value) - 0) / (2.0 - 0) * 100%), 
+        to right,
+        rgb(20, 153, 242) 0%,
+        rgb(20, 153, 242) calc((var(--temperature_value) - 0) / (2 - 0) * 100%),
+        rgb(202, 199, 199) calc((var(--temperature_value) - 0) / (2 - 0) * 100%),
         rgb(202, 199, 199) 100%
       );
     }
 
     .second {
       background: linear-gradient(
-        to right, 
-        rgb(20, 153, 242) 0%, 
-        rgb(20, 153, 242) calc((var(--presencePenalty_value) - (-2.0)) / (2.0 - (-2.0)) * 100%), 
-        rgb(202, 199, 199) calc((var(--presencePenalty_value) - (-2.0)) / (2.0 - (-2.0)) * 100%), 
+        to right,
+        rgb(20, 153, 242) 0%,
+        rgb(20, 153, 242)
+          calc((var(--presencePenalty_value) - (-2)) / (2 - (-2)) * 100%),
+        rgb(202, 199, 199)
+          calc((var(--presencePenalty_value) - (-2)) / (2 - (-2)) * 100%),
         rgb(202, 199, 199) 100%
       );
     }
 
     .third {
       background: linear-gradient(
-        to right, 
-        rgb(20, 153, 242) 0%, 
-        rgb(20, 153, 242) calc((var(--frequencyPenalty_value) - (-2.0)) / (2.0 - (-2.0)) * 100%), 
-        rgb(202, 199, 199) calc((var(--frequencyPenalty_value) - (-2.0)) / (2.0 - (-2.0)) * 100%), 
+        to right,
+        rgb(20, 153, 242) 0%,
+        rgb(20, 153, 242)
+          calc((var(--frequencyPenalty_value) - (-2)) / (2 - (-2)) * 100%),
+        rgb(202, 199, 199)
+          calc((var(--frequencyPenalty_value) - (-2)) / (2 - (-2)) * 100%),
         rgb(202, 199, 199) 100%
       );
     }

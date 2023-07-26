@@ -9,14 +9,14 @@ import { message } from "ant-design-vue";
 import "ant-design-vue/dist/antd.css";
 
 export async function translateAndExportFiles(req) {
-  const { content, targetLang, extraPrompt } = req;
+  const { content, targetLang, extraPrompt, parameterChanged } = req;
   const translations = [];
   for (let i = 0; i < targetLang.length; i++) {
     console.log(targetLang[i]);
     const messages = [
       {
         role: "system",
-        content: `You are a helpful assistant that translates a i18n locale key-value objects to ${targetLang[i]}.
+        content: `You are a helpful assistant that translates a i18n locale key-value objects to ${targetLang[i]}!!!!
             It's a key-value objects, contains many key-value values, translate each of them and make a new array of translated strings.
             Consider all the string as a context to make better translation.\n`,
       },
@@ -57,6 +57,7 @@ export async function translateAndExportFiles(req) {
               content: JSON.stringify(freezeChunk),
             },
           ],
+          parameterChanged,
         })
           .then((completion) => {
             if (completion === "这是GPT的回答") {
@@ -69,14 +70,13 @@ export async function translateAndExportFiles(req) {
           })
           .then((r) => {
             if (r.length !== freezeChunk.length) {
-              // message.error("返回数据数量不正确，请重新翻译")
               console.log("diff ", r.length, freezeChunk.length);
             }
             return r;
           })
           .catch((err) => {
             console.log(err);
-            message.error("翻译失败，请重新翻译");
+            message.error(`${targetLang[i]}部分数据翻译失败`);
             return freezeChunk;
           });
         chunk = [];
@@ -93,6 +93,7 @@ export async function translateAndExportFiles(req) {
           content: JSON.stringify(freezeChunk),
         },
       ],
+      parameterChanged,
     })
       .then((completion) => {
         if (completion === "这是GPT的回答") {
@@ -105,19 +106,25 @@ export async function translateAndExportFiles(req) {
       })
       .then((r) => {
         if (r.length !== freezeChunk.length) {
-          message.error("返回数据数量不正确");
           console.log("diff ", r.length, freezeChunk.length);
         }
         return r;
       })
       .catch((err) => {
         console.log(err);
-        // message.error("翻译失败，请重新翻译")
+        message.error(`${targetLang[i]}部分数据翻译失败`);
         return freezeChunk;
       });
     tasks.push(ft);
     chunk = [];
     chunkSize = 0;
+    if (tasks[0].length !== requireTranslation.length) {
+      message.error(
+        `${targetLang[i]}语言返回数据数量不正确,少了${
+          requireTranslation.length - tasks.length
+        }条`
+      );
+    }
     const translated = (await Promise.all(tasks)).flatMap((t) => t);
     const nextPairs = translated.concat(noTranslation);
     const result = buildJsonByPairs(nextPairs);

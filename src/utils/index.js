@@ -46,11 +46,11 @@ export const createChatCompletion = async (props) => {
     headers,
     body: JSON.stringify({
       model: "gpt-35-turbo-version-0301",
-      frequency_penalty: 0, // -2.0~2.0 值越高表达用词越罕见
-      max_tokens: 2048, // 生成回应时允许的最大标记数
-      presence_penalty: 0, // -2.0~2.0 值越高与上下文关联度越大
+      frequency_penalty: Number(props.parameterChanged.frequencyPenalty), // -2.0~2.0 值越高表达用词越罕见
+      max_tokens: Number(props.parameterChanged.tokensValue), // 生成回应时允许的最大标记数
+      presence_penalty: Number(props.parameterChanged.presencePenalty), // -2.0~2.0 值越高与上下文关联度越大
       stream: true,
-      temperature: 0, // 0~2 值越高结果越随机多样
+      temperature: Number(props.parameterChanged.temperature), // 0~2 值越高结果越随机多样
       top_p: 1,
       messages: props.messages,
     }),
