@@ -118,10 +118,14 @@ export async function translateAndExportFiles(req) {
     tasks.push(ft);
     chunk = [];
     chunkSize = 0;
-    if (tasks[0].length !== requireTranslation.length) {
+    const allLength = tasks.reduce(
+      (acc, subLength) => acc + subLength.length,
+      0
+    );
+    if (allLength !== requireTranslation.length) {
       message.error(
         `${targetLang[i]}语言返回数据数量不正确,少了${
-          requireTranslation.length - tasks.length
+          requireTranslation.length - allLength
         }条`
       );
     }

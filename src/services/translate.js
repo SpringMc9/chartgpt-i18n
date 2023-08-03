@@ -121,9 +121,10 @@ export async function translateService(req) {
   tasks.push(ft);
   chunk = [];
   chunkSize = 0;
-  if (tasks[0].length !== requireTranslation.length) {
+  const allLength = tasks.reduce((acc, subLength) => acc + subLength.length, 0);
+  if (allLength !== requireTranslation.length) {
     message.error(
-      `返回数据数量不正确,少了${requireTranslation.length - tasks.length}条`
+      `返回数据数量不正确,少了${requireTranslation.length - allLength}条`
     );
   }
   const translated = (await Promise.all(tasks)).flatMap((t) => t);
