@@ -287,7 +287,7 @@ export default {
   }
 
   .translate-content {
-    width: 80%;
+    width: 85%;
     height: auto;
     display: flex;
     justify-content: center;
@@ -302,7 +302,7 @@ export default {
     }
 
     .original-locale {
-      flex: 1;
+      width: 49%;
       height: 680px;
       border-radius: 7px;
       border: 2px solid black;
@@ -324,9 +324,9 @@ export default {
     }
 
     .translated-locale {
-      margin-left: 10px;
-      flex: 1;
+      width: 49%;
       height: 680px;
+      margin-left: 10px;
       border-radius: 7px;
       border: 2px solid black;
 
