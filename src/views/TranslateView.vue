@@ -108,11 +108,13 @@ export default {
         value: "",
         language: "json",
         theme: "vs",
+        automaticLayout: true
       });
       editor_trans = monaco.editor.create(editorTrans.value, {
         value: "",
         language: "json",
         theme: "vs",
+        automaticLayout: true
       });
 
       editor_origin.onDidChangeModelContent(() => {
