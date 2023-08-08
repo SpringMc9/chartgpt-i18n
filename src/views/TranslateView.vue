@@ -45,7 +45,6 @@
         <div
           class="original"
           ref="editorOrigin"
-          style="width: 600px; height: 650px"
         ></div>
       </div>
       <div class="translated-locale">
@@ -58,7 +57,6 @@
         <div
           class="translated"
           ref="editorTrans"
-          style="width: 600px; height: 650px"
         ></div>
       </div>
     </div>
@@ -239,6 +237,7 @@ export default {
 
 <style scoped lang="scss">
 .container {
+  width: 100%;
   display: inline-block;
 
   .content-header {
@@ -278,27 +277,31 @@ export default {
   }
 
   .text-field {
+    width: 100%;
     margin-top: 10px;
     text-align: left;
+    display: flex;
+    justify-content: center;
   }
 
   .translate-content {
+    width: 80%;
     height: auto;
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
-    margin-top: 10px;
-    margin-bottom: 20px;
+    margin: 18px auto;
+
 
     .text {
       font-size: 20px;
       font-weight: 600;
       margin: 5px 0;
+      text-align: center;
     }
 
     .original-locale {
-      width: 606px;
-      height: 696px;
+      flex: 1;
+      height: 680px;
       border-radius: 7px;
       border: 2px solid black;
 
@@ -311,15 +314,17 @@ export default {
         }
       }
       .original {
+        width: 100%; 
+        height: 93%;
         display: inline-block;
         text-align: left;
       }
     }
 
     .translated-locale {
-      width: 606px;
       margin-left: 10px;
-      height: 696px;
+      flex: 1;
+      height: 680px;
       border-radius: 7px;
       border: 2px solid black;
 
@@ -333,6 +338,8 @@ export default {
       }
 
       .translated {
+        width: 100%;
+        height: 93%;
         display: inline-block;
         text-align: left;
       }

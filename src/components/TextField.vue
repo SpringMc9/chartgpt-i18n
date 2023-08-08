@@ -43,15 +43,20 @@ export default {
 </script>
 <style scoped lang="scss">
 .textfield {
-  display: inline-block;
-  .text-label-display {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 5px;
+  width: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  .text-label {
+    justify-content: unset !important;
+    .text-label-display {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
   }
 
   .text-input {
-    width: 1212px;
+    width: 100%;
     height: 30px;
     border-radius: 7px;
     border: none;
