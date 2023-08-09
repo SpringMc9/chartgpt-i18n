@@ -13,7 +13,7 @@
   // text-align: center;
   color: #2c3e50;
   background-color: #EAF6FF;
-  min-height: 98vh;
+  min-height: 100vh;
 }
 
 nav {
